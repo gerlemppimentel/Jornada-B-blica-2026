@@ -18,34 +18,27 @@ const Index = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
         
-        if (authError || !user) {
-          console.error("Usuário não autenticado:", authError);
-          return;
-        }
+        if (!user) return;
 
-        console.log("Usuário autenticado:", user.email);
-
-        // 1. Tenta buscar da tabela 'profiles'
-        const { data: profile, error: profileError } = await supabase
+        // Tenta pegar da tabela profiles primeiro
+        const { data: profile } = await supabase
           .from("profiles")
           .select("first_name")
           .eq("id", user.id)
           .maybeSingle();
         
         if (profile?.first_name) {
-          console.log("Nome encontrado na tabela profiles:", profile.first_name);
           setUserName(profile.first_name);
         } else if (user.user_metadata?.first_name) {
-          // 2. Fallback: Tenta buscar dos metadados da sessão
-          console.log("Nome encontrado nos metadados:", user.user_metadata.first_name);
           setUserName(user.user_metadata.first_name);
-        } else {
-          console.warn("Nenhum nome encontrado para o usuário:", user.id);
+        } else if (user.user_metadata?.name) {
+          setUserName(user.user_metadata.name);
         }
       } catch (err) {
-        console.error("Erro inesperado ao buscar perfil:", err);
+        console.error("Erro ao carregar perfil:", err);
       }
     };
     
@@ -57,7 +50,6 @@ const Index = () => {
       <Navbar />
       
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 space-y-8">
-        {/* Header Section */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-slate-900">
             Bem-Vindo{userName ? `, ${userName}` : ""}!
@@ -65,7 +57,6 @@ const Index = () => {
           <p className="text-slate-500">Acompanhe sua jornada semanal através da Palavra.</p>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -101,7 +92,6 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Weekly Progress Section */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -113,7 +103,6 @@ const Index = () => {
           <WeeklyProgress onProgressUpdate={setCompletedCount} />
         </div>
 
-        {/* Daily Verse Card */}
         <div className="max-w-2xl">
           <Card className="border-none shadow-sm bg-slate-800 text-white rounded-2xl overflow-hidden">
             <CardContent className="p-6 space-y-4">
