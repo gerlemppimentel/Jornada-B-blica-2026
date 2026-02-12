@@ -17,19 +17,31 @@ const Index = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      // 1. Pega o usuário logado
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error("Erro ao buscar usuário:", userError);
+        return;
+      }
+
       if (user) {
-        const { data: profile } = await supabase
+        // Tenta pegar primeiro da tabela de perfis
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("first_name")
           .eq("id", user.id)
-          .single();
+          .maybeSingle(); // Usando maybeSingle para não disparar erro se não existir
         
         if (profile?.first_name) {
           setUserName(profile.first_name);
+        } else if (user.user_metadata?.first_name) {
+          // Fallback: Tenta pegar dos metadados da conta (útil para novos registros)
+          setUserName(user.user_metadata.first_name);
         }
       }
     };
+    
     fetchProfile();
   }, []);
 
@@ -41,7 +53,7 @@ const Index = () => {
         {/* Header Section */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-slate-900">
-            Bem-Vindo {userName && `, ${userName}`}!
+            Bem-Vindo{userName ? `, ${userName}` : ""}!
           </h1>
           <p className="text-slate-500">Acompanhe sua jornada semanal através da Palavra.</p>
         </div>
