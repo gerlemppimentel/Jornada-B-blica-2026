@@ -17,28 +17,35 @@ const Index = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      // 1. Pega o usuário logado
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) {
-        console.error("Erro ao buscar usuário:", userError);
-        return;
-      }
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          console.error("Usuário não autenticado:", authError);
+          return;
+        }
 
-      if (user) {
-        // Tenta pegar primeiro da tabela de perfis
+        console.log("Usuário autenticado:", user.email);
+
+        // 1. Tenta buscar da tabela 'profiles'
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("first_name")
           .eq("id", user.id)
-          .maybeSingle(); // Usando maybeSingle para não disparar erro se não existir
+          .maybeSingle();
         
         if (profile?.first_name) {
+          console.log("Nome encontrado na tabela profiles:", profile.first_name);
           setUserName(profile.first_name);
         } else if (user.user_metadata?.first_name) {
-          // Fallback: Tenta pegar dos metadados da conta (útil para novos registros)
+          // 2. Fallback: Tenta buscar dos metadados da sessão
+          console.log("Nome encontrado nos metadados:", user.user_metadata.first_name);
           setUserName(user.user_metadata.first_name);
+        } else {
+          console.warn("Nenhum nome encontrado para o usuário:", user.id);
         }
+      } catch (err) {
+        console.error("Erro inesperado ao buscar perfil:", err);
       }
     };
     
