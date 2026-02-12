@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,34 +16,40 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      toast.error("Erro ao entrar: " + error.message);
-    } else {
+      if (error) throw error;
+      
       toast.success("Login realizado com sucesso!");
       navigate("/");
+    } catch (error: any) {
+      toast.error("Erro ao entrar: " + error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (error) {
-      toast.error("Erro ao cadastrar: " + error.message);
-    } else {
+      if (error) throw error;
+      
       toast.success("Cadastro realizado! Verifique seu e-mail ou faça login.");
+    } catch (error: any) {
+      toast.error("Erro ao cadastrar: " + error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -90,6 +96,7 @@ const Login = () => {
               </Button>
               <Button 
                 variant="outline" 
+                type="button"
                 onClick={handleSignUp} 
                 disabled={loading}
                 className="w-full border-slate-200 text-slate-600 rounded-xl h-12"
