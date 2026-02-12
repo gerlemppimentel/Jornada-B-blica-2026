@@ -20,7 +20,7 @@ const Index = () => {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 space-y-8">
         {/* Header Section */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-slate-900">Olá, Discípulo!</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Bem-Vindo, amante da Palavra de Deus!</h1>
           <p className="text-slate-500">Acompanhe sua jornada semanal através da Palavra.</p>
         </div>
 
