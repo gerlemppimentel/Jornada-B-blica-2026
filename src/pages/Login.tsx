@@ -10,43 +10,41 @@ import { toast } from "sonner";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [congregation, setCongregation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      
-      toast.success("Login realizado com sucesso!");
-      navigate("/");
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              congregation: congregation,
+            }
+          }
+        });
+        if (error) throw error;
+        toast.success("Cadastro realizado! Você já pode entrar.");
+        setIsSignUp(false);
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success("Login realizado com sucesso!");
+        navigate("/");
+      }
     } catch (error: any) {
-      toast.error("Erro ao entrar: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      
-      toast.success("Cadastro realizado! Verifique seu e-mail ou faça login.");
-    } catch (error: any) {
-      toast.error("Erro ao cadastrar: " + error.message);
+      toast.error("Erro: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -62,7 +60,35 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4">
+            {isSignUp && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Nome Completo</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="Seu nome"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="congregation">Congregação</Label>
+                  <Input
+                    id="congregation"
+                    type="text"
+                    placeholder="Ex: Central"
+                    value={congregation}
+                    onChange={(e) => setCongregation(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -88,20 +114,19 @@ const Login = () => {
             </div>
             <div className="flex flex-col gap-2 pt-2">
               <Button 
-                onClick={handleLogin} 
+                type="submit"
                 disabled={loading} 
                 className="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-xl h-12"
               >
-                {loading ? "Entrando..." : "Entrar"}
+                {loading ? "Processando..." : (isSignUp ? "Criar Conta" : "Entrar")}
               </Button>
               <Button 
-                variant="outline" 
+                variant="ghost" 
                 type="button"
-                onClick={handleSignUp} 
-                disabled={loading}
-                className="w-full border-slate-200 text-slate-600 rounded-xl h-12"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="w-full text-slate-600 rounded-xl"
               >
-                Criar Conta
+                {isSignUp ? "Já tenho uma conta" : "Não tenho conta? Cadastre-se"}
               </Button>
             </div>
           </form>

@@ -1,17 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Calendar, Trophy, LayoutGrid } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import WeeklyProgress from "@/components/WeeklyProgress";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [completedCount, setCompletedCount] = useState(0);
-  const totalWeeks = 50;
+  const [userName, setUserName] = useState("");
+  const totalWeeks = 47;
   const progressPercentage = Math.round((completedCount / totalWeeks) * 100);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("first_name")
+          .eq("id", user.id)
+          .single();
+        
+        if (profile?.first_name) {
+          setUserName(profile.first_name);
+        }
+      }
+    };
+    fetchProfile();
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -20,7 +40,9 @@ const Index = () => {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 space-y-8">
         {/* Header Section */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-slate-900">Bem-Vindo, amante da Palavra de Deus!</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Bem-Vindo {userName && `, ${userName}`}!
+          </h1>
           <p className="text-slate-500">Acompanhe sua jornada semanal através da Palavra.</p>
         </div>
 

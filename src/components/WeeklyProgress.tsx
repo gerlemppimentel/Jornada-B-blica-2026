@@ -89,7 +89,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-4">
-      {Array.from({ length: 50 }, (_, i) => i + 1).map((week) => (
+      {Array.from({ length: 47 }, (_, i) => i + 1).map((week) => (
         <WeekButton
           key={week}
           week={week}
