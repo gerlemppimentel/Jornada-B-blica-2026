@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -52,11 +53,25 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-md border-none shadow-xl">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold text-slate-800">Jornada Bíblica 2026</CardTitle>
+      <Card className="w-full max-w-md border-none shadow-xl relative overflow-hidden">
+        {isSignUp && (
+          <button 
+            onClick={() => setIsSignUp(false)}
+            className="absolute left-4 top-6 p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+            title="Voltar para o login"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        )}
+        
+        <CardHeader className="space-y-1 text-center pt-8">
+          <CardTitle className="text-2xl font-bold text-slate-800">
+            {isSignUp ? "Criar Conta" : "Jornada Bíblica 2026"}
+          </CardTitle>
           <CardDescription className="text-slate-500">
-            Igreja Evangélica Assembleia de Deus em Jaraguá do Sul
+            {isSignUp 
+              ? "Preencha seus dados para começar a jornada" 
+              : "Igreja Evangélica Assembleia de Deus em Jaraguá do Sul"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,16 +133,25 @@ const Login = () => {
                 disabled={loading} 
                 className="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-xl h-12"
               >
-                {loading ? "Processando..." : (isSignUp ? "Criar Conta" : "Entrar")}
+                {loading ? "Processando..." : (isSignUp ? "Concluir Cadastro" : "Entrar")}
               </Button>
-              <Button 
-                variant="ghost" 
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="w-full text-slate-600 rounded-xl"
-              >
-                {isSignUp ? "Já tenho uma conta" : "Não tenho conta? Cadastre-se"}
-              </Button>
+              
+              {!isSignUp && (
+                <Button 
+                  variant="ghost" 
+                  type="button"
+                  onClick={() => setIsSignUp(true)}
+                  className="w-full text-slate-600 rounded-xl"
+                >
+                  Não tenho conta? Cadastre-se
+                </Button>
+              )}
+              
+              {isSignUp && (
+                <p className="text-center text-sm text-slate-500 mt-2">
+                  Ao se cadastrar, você concorda com os termos da jornada.
+                </p>
+              )}
             </div>
           </form>
         </CardContent>
