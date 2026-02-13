@@ -43,24 +43,8 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
   };
 
   const toggleWeek = async (week: number) => {
-    const isAdding = !completedWeeks.has(week);
-    
-    // Validação Sequencial
-    if (isAdding) {
-      // Para marcar a semana N, a semana N-1 deve estar marcada (exceto para a semana 1)
-      if (week > 1 && !completedWeeks.has(week - 1)) {
-        toast.error(`Você precisa concluir a Semana ${week - 1} antes de marcar a Semana ${week}.`);
-        return;
-      }
-    } else {
-      // Para desmarcar a semana N, a semana N+1 não deve estar marcada (para não criar buracos)
-      if (completedWeeks.has(week + 1)) {
-        toast.error(`Desmarque as semanas seguintes antes de desmarcar a Semana ${week}.`);
-        return;
-      }
-    }
-
     setSyncing(week);
+    const isAdding = !completedWeeks.has(week);
     const weekLabel = `Semana ${week}`;
 
     try {
@@ -68,6 +52,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       if (!user) return;
 
       if (isAdding) {
+        // Usamos upsert para evitar erro de duplicata caso o registro já exista no banco
         const { error } = await supabase
           .from("readings")
           .upsert(
@@ -86,6 +71,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
         if (error) throw error;
       }
 
+      // Atualiza o estado local apenas após sucesso no banco
       setCompletedWeeks(prev => {
         const next = new Set(prev);
         if (isAdding) next.add(week);
@@ -96,6 +82,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
 
       toast.success(`${weekLabel} ${isAdding ? 'concluída!' : 'desmarcada.'}`);
     } catch (error: any) {
+      // Se for erro de duplicata, apenas sincronizamos o estado local
       if (error.code === '23505') {
         fetchProgress();
       } else {
