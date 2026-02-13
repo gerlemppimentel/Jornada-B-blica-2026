@@ -27,21 +27,23 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center gap-2">
-            <div className="bg-slate-800 p-2 rounded-lg">
+            <div className="bg-slate-800 p-2 rounded-lg shrink-0">
               <BookOpen className="text-white w-5 h-5" />
             </div>
-            <span className="font-bold text-slate-800 hidden sm:block">Jornada Bíblica 2026</span>
+            <span className="font-bold text-slate-800 hidden xs:block text-sm sm:text-base">
+              Jornada Bíblica 2026
+            </span>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl">
+                <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4">
                   <Info className="w-4 h-4" />
-                  <span className="hidden xs:inline">Sobre...</span>
+                  <span className="hidden sm:inline">Sobre</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md rounded-2xl">
+              <DialogContent className="w-[90vw] max-w-md rounded-2xl">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold text-slate-800">Sobre o Aplicativo</DialogTitle>
                 </DialogHeader>
@@ -75,8 +77,9 @@ const Navbar = () => {
 
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={handleLogout}
-              className="text-slate-600 hover:text-red-600 flex items-center gap-2 rounded-xl"
+              className="text-slate-600 hover:text-red-600 flex items-center gap-2 rounded-xl px-2 sm:px-4"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Sair</span>
