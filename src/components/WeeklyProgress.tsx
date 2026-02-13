@@ -32,7 +32,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           .filter(r => r.book_name.startsWith("Semana "))
           .map(r => parseInt(r.book_name.replace("Semana ", "").trim()))
       );
-      
+
       setCompletedWeeks(weeks);
       onProgressUpdate(weeks.size);
     } catch (error) {
@@ -47,6 +47,25 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
     const isAdding = !completedWeeks.has(week);
     const weekLabel = `Semana ${week}`;
 
+    // Verificação para marcação sequencial
+    if (isAdding) {
+      // Encontrar a última semana concluída
+      let lastCompleted = 0;
+      for (let i = week - 1; i >= 1; i--) {
+        if (completedWeeks.has(i)) {
+          lastCompleted = i;
+          break;
+        }
+      }
+
+      // Verificar se está tentando marcar uma semana que não é sequencial
+      if (lastCompleted < week - 1) {
+        toast.error(`Você precisa concluir a semana ${week - 1} primeiro!`);
+        setSyncing(null);
+        return;
+      }
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -56,18 +75,29 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
         const { error } = await supabase
           .from("readings")
           .upsert(
-            { user_id: user.id, book_name: weekLabel },
+            {
+              user_id: user.id,
+              book_name: weekLabel
+            },
             { onConflict: 'user_id,book_name' }
           );
-        
+
         if (error) throw error;
       } else {
+        // Permitir desmarcar apenas a última semana marcada
+        const maxCompleted = Math.max(...Array.from(completedWeeks));
+        if (week !== maxCompleted && completedWeeks.size > 0) {
+          toast.error("Você só pode desmarcar a última semana concluída!");
+          setSyncing(null);
+          return;
+        }
+
         const { error } = await supabase
           .from("readings")
           .delete()
           .eq("user_id", user.id)
           .eq("book_name", weekLabel);
-        
+
         if (error) throw error;
       }
 
@@ -104,12 +134,12 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 sm:gap-4">
       {Array.from({ length: 47 }, (_, i) => i + 1).map((week) => (
-        <WeekButton
-          key={week}
-          week={week}
-          isCompleted={completedWeeks.has(week)}
-          onClick={toggleWeek}
-          disabled={syncing === week}
+        <WeekButton 
+          key={week} 
+          week={week} 
+          isCompleted={completedWeeks.has(week)} 
+          onClick={toggleWeek} 
+          disabled={syncing === week} 
         />
       ))}
     </div>
