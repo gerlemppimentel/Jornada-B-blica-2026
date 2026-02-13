@@ -30,7 +30,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       const weeks = new Set(
         data
           .filter(r => r.book_name.startsWith("Semana "))
-          .map(r => parseInt(r.book_name.replace("Semana ", "")))
+          .map(r => parseInt(r.book_name.replace("Semana ", "").trim()))
       );
       
       setCompletedWeeks(weeks);
@@ -52,9 +52,14 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       if (!user) return;
 
       if (isAdding) {
+        // Usamos upsert para evitar erro de duplicata caso o registro já exista no banco
         const { error } = await supabase
           .from("readings")
-          .insert({ user_id: user.id, book_name: weekLabel });
+          .upsert(
+            { user_id: user.id, book_name: weekLabel },
+            { onConflict: 'user_id,book_name' }
+          );
+        
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -62,18 +67,27 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           .delete()
           .eq("user_id", user.id)
           .eq("book_name", weekLabel);
+        
         if (error) throw error;
       }
 
-      const newWeeks = new Set(completedWeeks);
-      if (isAdding) newWeeks.add(week);
-      else newWeeks.delete(week);
-      
-      setCompletedWeeks(newWeeks);
-      onProgressUpdate(newWeeks.size);
+      // Atualiza o estado local apenas após sucesso no banco
+      setCompletedWeeks(prev => {
+        const next = new Set(prev);
+        if (isAdding) next.add(week);
+        else next.delete(week);
+        onProgressUpdate(next.size);
+        return next;
+      });
+
       toast.success(`${weekLabel} ${isAdding ? 'concluída!' : 'desmarcada.'}`);
     } catch (error: any) {
-      toast.error("Erro ao salvar: " + error.message);
+      // Se for erro de duplicata, apenas sincronizamos o estado local
+      if (error.code === '23505') {
+        fetchProgress();
+      } else {
+        toast.error("Erro ao salvar: " + error.message);
+      }
     } finally {
       setSyncing(null);
     }
