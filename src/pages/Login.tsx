@@ -55,9 +55,9 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 p-4 py-8">
-      {/* Imagem de Abertura Oficial */}
-      <div className="w-full max-w-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl border-8 border-white aspect-square bg-white">
+      {/* Imagem de Abertura Oficial - Redimensionada em 50% */}
+      <div className="w-full max-w-[220px] mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="relative overflow-hidden rounded-[2rem] shadow-xl border-4 border-white aspect-square bg-white">
           <img 
             src="/nova-jornada.jpg" 
             alt="Jornada Bíblica 2026" 
