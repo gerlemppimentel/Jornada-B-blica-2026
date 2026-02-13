@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,34 +54,50 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-md border-none shadow-xl relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 p-4 py-8">
+      {/* Imagem de Abertura */}
+      <div className="w-full max-w-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl border-8 border-white aspect-square bg-white">
+          <img 
+            src="/nova-jornada.jpg" 
+            alt="Jornada Bíblica 2026" 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback caso a imagem local não seja encontrada
+              e.currentTarget.src = "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&q=80&w=800";
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+        </div>
+      </div>
+
+      <Card className="w-full max-w-md border-none shadow-xl relative overflow-hidden rounded-[2rem]">
         {isSignUp && (
           <button 
             onClick={() => setIsSignUp(false)}
-            className="absolute left-4 top-6 p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+            className="absolute left-6 top-8 p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors z-10"
             title="Voltar para o login"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         )}
         
-        <CardHeader className="space-y-1 text-center pt-8">
-          <CardTitle className="text-2xl font-bold text-slate-800">
-            {isSignUp ? "Criar Conta" : "Jornada Bíblica 2026"}
+        <CardHeader className="space-y-1 text-center pt-10 px-8">
+          <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">
+            {isSignUp ? "Criar Conta" : "Entrar na Jornada"}
           </CardTitle>
-          <CardDescription className="text-slate-500">
+          <CardDescription className="text-slate-500 font-medium">
             {isSignUp 
-              ? "Preencha seus dados para começar a jornada" 
-              : "Igreja Evangélica Assembleia de Deus em Jaraguá do Sul"}
+              ? "Preencha seus dados para começar" 
+              : "AD Jaraguá do Sul"}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-8 pb-10">
           <form onSubmit={handleAuth} className="space-y-4">
             {isSignUp && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Nome Completo</Label>
+                  <Label htmlFor="firstName" className="text-slate-600 font-semibold ml-1">Nome Completo</Label>
                   <Input
                     id="firstName"
                     type="text"
@@ -87,11 +105,11 @@ const Login = () => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
-                    className="rounded-xl"
+                    className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="congregation">Congregação</Label>
+                  <Label htmlFor="congregation" className="text-slate-600 font-semibold ml-1">Congregação</Label>
                   <Input
                     id="congregation"
                     type="text"
@@ -99,13 +117,13 @@ const Login = () => {
                     value={congregation}
                     onChange={(e) => setCongregation(e.target.value)}
                     required
-                    className="rounded-xl"
+                    className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all"
                   />
                 </div>
               </>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email" className="text-slate-600 font-semibold ml-1">E-mail</Label>
               <Input
                 id="email"
                 type="email"
@@ -113,27 +131,28 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="rounded-xl"
+                className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password" className="text-slate-600 font-semibold ml-1">Senha</Label>
               <Input
                 id="password"
                 type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="rounded-xl"
+                className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all"
               />
             </div>
-            <div className="flex flex-col gap-2 pt-2">
+            <div className="flex flex-col gap-3 pt-4">
               <Button 
                 type="submit"
                 disabled={loading} 
-                className="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-xl h-12"
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 text-lg font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
               >
-                {loading ? "Processando..." : (isSignUp ? "Concluir Cadastro" : "Entrar")}
+                {loading ? "Processando..." : (isSignUp ? "Concluir Cadastro" : "Acessar Agora")}
               </Button>
               
               {!isSignUp && (
@@ -141,21 +160,21 @@ const Login = () => {
                   variant="ghost" 
                   type="button"
                   onClick={() => setIsSignUp(true)}
-                  className="w-full text-slate-600 rounded-xl"
+                  className="w-full text-slate-500 rounded-2xl h-12 hover:bg-slate-50 font-medium"
                 >
-                  Não tenho conta? Cadastre-se
+                  Ainda não tem conta? <span className="text-slate-900 font-bold ml-1 hover:underline">Cadastre-se</span>
                 </Button>
-              )}
-              
-              {isSignUp && (
-                <p className="text-center text-sm text-slate-500 mt-2">
-                  Ao se cadastrar, você concorda com os termos da jornada.
-                </p>
               )}
             </div>
           </form>
         </CardContent>
       </Card>
+      
+      <footer className="mt-8 text-center space-y-2">
+        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+          © 2026 Jornada Bíblica • Assembleia de Deus
+        </p>
+      </footer>
     </div>
   );
 };
