@@ -55,19 +55,14 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 p-4 py-8">
-      {/* Imagem de Abertura */}
+      {/* Imagem de Abertura Oficial */}
       <div className="w-full max-w-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl border-8 border-white aspect-square bg-white">
           <img 
             src="/nova-jornada.jpg" 
             alt="Jornada Bíblica 2026" 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback caso a imagem local não seja encontrada
-              e.currentTarget.src = "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&q=80&w=800";
-            }}
+            className="w-full h-full object-contain"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
         </div>
       </div>
 
