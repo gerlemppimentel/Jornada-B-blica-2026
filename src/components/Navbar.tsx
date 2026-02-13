@@ -54,7 +54,12 @@ const Navbar = () => {
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Desenvolvedor</p>
                     <div>
                       <p className="text-slate-800 font-semibold">Gerlem Pantoja Pimentel</p>
-                      <p className="text-slate-500 text-sm">gerlem.dev@outlook.com</p>
+                      <a 
+                        href="mailto:gerlem.dev@outlook.com" 
+                        className="text-blue-600 hover:text-blue-800 text-sm transition-colors hover:underline"
+                      >
+                        gerlem.dev@outlook.com
+                      </a>
                     </div>
                   </div>
                 </div>
