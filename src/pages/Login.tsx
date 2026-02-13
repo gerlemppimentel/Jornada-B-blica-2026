@@ -55,18 +55,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 p-4 py-8">
-      {/* Imagem de Abertura Oficial - Redimensionada em 50% */}
-      <div className="w-full max-w-[220px] mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        <div className="relative overflow-hidden rounded-[2rem] shadow-xl border-4 border-white aspect-square bg-white">
-          <img 
-            src="/nova-jornada.jpg" 
-            alt="Jornada Bíblica 2026" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      </div>
-
-      <Card className="w-full max-w-md border-none shadow-xl relative overflow-hidden rounded-[2rem]">
+      <Card className="w-full max-w-md border-none shadow-2xl relative overflow-hidden rounded-[2.5rem] bg-white pt-10">
         {isSignUp && (
           <button 
             onClick={() => setIsSignUp(false)}
@@ -76,8 +65,19 @@ const Login = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
         )}
+
+        {/* Imagem de Abertura agora dentro da moldura branca */}
+        <div className="flex justify-center px-8 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="w-full max-w-[180px] relative overflow-hidden rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white">
+            <img 
+              src="/nova-jornada.jpg" 
+              alt="Jornada Bíblica 2026" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
         
-        <CardHeader className="space-y-1 text-center pt-10 px-8">
+        <CardHeader className="space-y-1 text-center px-8 pb-4">
           <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">
             {isSignUp ? "Criar Conta" : "Entrar na Jornada"}
           </CardTitle>
@@ -87,6 +87,7 @@ const Login = () => {
               : "AD Jaraguá do Sul"}
           </CardDescription>
         </CardHeader>
+        
         <CardContent className="px-8 pb-10">
           <form onSubmit={handleAuth} className="space-y-4">
             {isSignUp && (
