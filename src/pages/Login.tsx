@@ -58,12 +58,28 @@ const Login = () => {
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const navigate = useNavigate();
 
+  const validatePassword = (pass: string) => {
+    // Exatamente 6 dígitos numéricos
+    const regex = /^[0-9]{6}$/;
+    return regex.test(pass);
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isSignUp && !congregation) {
-      toast.error("Por favor, selecione sua congregação.");
-      return;
+    if (isSignUp) {
+      if (!firstName) {
+        toast.error("Por favor, informe seu nome.");
+        return;
+      }
+      if (!congregation) {
+        toast.error("Por favor, selecione sua congregação.");
+        return;
+      }
+      if (!validatePassword(password)) {
+        toast.error("A senha deve ter exatamente 6 números.");
+        return;
+      }
     }
 
     setLoading(true);
@@ -230,7 +246,10 @@ const Login = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password">Senha</Label>
+                  {isSignUp && <span className="text-[10px] text-slate-400 font-bold uppercase">6 números</span>}
+                </div>
                 <div className="relative">
                   <Input 
                     id="password" 
@@ -238,6 +257,8 @@ const Login = () => {
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
+                    maxLength={6}
+                    inputMode="numeric"
                     className="rounded-2xl h-12 bg-slate-50 pr-12" 
                   />
                   <button
