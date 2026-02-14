@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, EyeOff, Mail, ExternalLink, Copy } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -56,12 +56,7 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
-  const [currentUrl, setCurrentUrl] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setCurrentUrl(window.location.origin);
-  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,11 +108,6 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success("URL copiada!");
   };
 
   const handleResendConfirmation = async () => {
@@ -199,29 +189,15 @@ const Login = () => {
         <CardContent className="px-8 pb-10">
           {needsConfirmation ? (
             <div className="space-y-6">
-              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
-                <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-                  <ExternalLink size={16} />
-                  Configuração Necessária
-                </div>
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  Se o link no e-mail ainda abrir "localhost", você precisa configurar a URL abaixo no painel do Supabase (Auth {"->"} URL Configuration):
+              <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 text-center">
+                <Mail className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-600 font-medium">
+                  Enviamos um link de ativação para o seu e-mail. Por favor, verifique sua caixa de entrada e a pasta de spam.
                 </p>
-                <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-amber-200">
-                  <code className="text-[10px] flex-1 truncate font-mono">{currentUrl}</code>
-                  <button onClick={() => copyToClipboard(currentUrl)} className="p-1 hover:bg-slate-100 rounded-md">
-                    <Copy size={14} className="text-slate-400" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 text-center">
-                <Mail className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-sm text-slate-600">Verifique sua caixa de entrada.</p>
               </div>
               
               <Button onClick={handleResendConfirmation} disabled={loading} className="w-full bg-slate-900 rounded-2xl h-12 font-bold">
-                {loading ? "Reenviando..." : "Reenviar E-mail"}
+                {loading ? "Reenviando..." : "Reenviar E-mail de Confirmação"}
               </Button>
             </div>
           ) : (
