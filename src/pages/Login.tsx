@@ -276,6 +276,17 @@ const Login = () => {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                {!isSignUp && (
+                  <div className="flex justify-end">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  </div>
+                )}
               </div>
               
               <div className="flex flex-col gap-3 pt-4">

@@ -1,0 +1,16 @@
+{
+  "short_name": "Jornada 2026",
+  "name": "Jornada Bíblica 2026",
+  "icons": [
+    {
+      "src": "/nova-jornada.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0f172a",
+  "background_color": "#f8fafc"
+}
