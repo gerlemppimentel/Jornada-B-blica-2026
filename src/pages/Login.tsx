@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -55,6 +55,7 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -83,6 +84,7 @@ const Login = () => {
         
         if (error) throw error;
         toast.success("Cadastro realizado! Verifique seu e-mail para confirmar a conta.");
+        setNeedsConfirmation(true);
         setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -90,12 +92,44 @@ const Login = () => {
           password,
         });
         
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes("Email not confirmed")) {
+            setNeedsConfirmation(true);
+            throw new Error("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
+          }
+          throw error;
+        }
+        
         toast.success("Login realizado com sucesso!");
         navigate("/");
       }
     } catch (error: any) {
-      toast.error("Erro: " + error.message);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      toast.error("Por favor, informe seu e-mail primeiro.");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) throw error;
+      toast.success("E-mail de confirmação reenviado!");
+    } catch (error: any) {
+      toast.error("Erro ao reenviar: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -187,9 +221,12 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 p-4 py-8">
       <Card className="w-full max-w-md border-none shadow-2xl relative overflow-hidden rounded-[2.5rem] bg-white pt-10">
-        {isSignUp && (
+        {(isSignUp || needsConfirmation) && (
           <button 
-            onClick={() => setIsSignUp(false)}
+            onClick={() => {
+              setIsSignUp(false);
+              setNeedsConfirmation(false);
+            }}
             className="absolute left-6 top-8 p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors z-10"
             title="Voltar para o login"
           >
@@ -205,118 +242,145 @@ const Login = () => {
         
         <CardHeader className="space-y-1 text-center px-8 pb-4">
           <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">
-            {isSignUp ? "Criar Conta" : "Entrar na Jornada"}
+            {needsConfirmation ? "Confirme seu E-mail" : isSignUp ? "Criar Conta" : "Entrar na Jornada"}
           </CardTitle>
           <CardDescription className="text-slate-500 font-medium">
-            {isSignUp ? "Preencha seus dados para começar" : "AD Jaraguá do Sul"}
+            {needsConfirmation 
+              ? "Enviamos um link de ativação para você" 
+              : isSignUp 
+                ? "Preencha seus dados para começar" 
+                : "AD Jaraguá do Sul"}
           </CardDescription>
         </CardHeader>
         
         <CardContent className="px-8 pb-10">
-          <form onSubmit={handleAuth} className="space-y-4">
-            {isSignUp && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-slate-600 font-semibold ml-1">Nome Completo</Label>
-                  <Input 
-                    id="firstName" 
-                    type="text" 
-                    placeholder="Seu nome" 
-                    value={firstName} 
-                    onChange={(e) => setFirstName(e.target.value)} 
-                    required 
-                    className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="congregation" className="text-slate-600 font-semibold ml-1">Congregação</Label>
-                  <Select onValueChange={setCongregation} value={congregation} required>
-                    <SelectTrigger className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all">
-                      <SelectValue placeholder="Selecione sua congregação" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-2xl border-slate-100 shadow-xl max-h-[300px]">
-                      {CONGREGATIONS.map((name) => (
-                        <SelectItem key={name} value={name} className="rounded-xl focus:bg-slate-50">
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-600 font-semibold ml-1">E-mail</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="seu@email.com" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-                className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-600 font-semibold ml-1">Senha</Label>
-              <div className="relative">
-                <Input 
-                  id="password" 
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="••••••••" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  required 
-                  className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all pr-12" 
-                />
-                <button
-                  type="button"
-                  onMouseDown={() => setShowPassword(true)}
-                  onMouseUp={() => setShowPassword(false)}
-                  onMouseLeave={() => setShowPassword(false)}
-                  onTouchStart={() => setShowPassword(true)}
-                  onTouchEnd={() => setShowPassword(false)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
-                  title="Pressione para ver a senha"
+          {needsConfirmation ? (
+            <div className="space-y-6 text-center">
+              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                <Mail className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Verifique sua caixa de entrada (e a pasta de spam) para o e-mail de confirmação.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <Button 
+                  onClick={handleResendConfirmation}
+                  disabled={loading}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-12 font-bold transition-all"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                  {loading ? "Reenviando..." : "Reenviar E-mail"}
+                </Button>
+                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                  Importante: O link no e-mail pode levar alguns minutos para chegar.
+                </p>
               </div>
             </div>
-            
-            <div className="flex flex-col gap-3 pt-4">
-              <Button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 text-lg font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
-              >
-                {loading ? "Processando..." : (isSignUp ? "Concluir Cadastro" : "Acessar Agora")}
-              </Button>
-              
-              {!isSignUp && (
-                <button
-                  type="button"
-                  onClick={() => setIsForgotPassword(true)}
-                  className="text-sm text-slate-500 hover:text-slate-700 font-medium py-2 transition-colors"
-                >
-                  Esqueceu sua senha?
-                </button>
+          ) : (
+            <form onSubmit={handleAuth} className="space-y-4">
+              {isSignUp && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName" className="text-slate-600 font-semibold ml-1">Nome Completo</Label>
+                    <Input 
+                      id="firstName" 
+                      type="text" 
+                      placeholder="Seu nome" 
+                      value={firstName} 
+                      onChange={(e) => setFirstName(e.target.value)} 
+                      required 
+                      className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="congregation" className="text-slate-600 font-semibold ml-1">Congregação</Label>
+                    <Select onValueChange={setCongregation} value={congregation} required>
+                      <SelectTrigger className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all">
+                        <SelectValue placeholder="Selecione sua congregação" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-2xl border-slate-100 shadow-xl max-h-[300px]">
+                        {CONGREGATIONS.map((name) => (
+                          <SelectItem key={name} value={name} className="rounded-xl focus:bg-slate-50">
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               )}
               
-              {!isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-slate-600 font-semibold ml-1">E-mail</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="seu@email.com" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                  className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-slate-600 font-semibold ml-1">Senha</Label>
+                <div className="relative">
+                  <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all pr-12" 
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={() => setShowPassword(true)}
+                    onMouseUp={() => setShowPassword(false)}
+                    onMouseLeave={() => setShowPassword(false)}
+                    onTouchStart={() => setShowPassword(true)}
+                    onTouchEnd={() => setShowPassword(false)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+                    title="Pressione para ver a senha"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-3 pt-4">
                 <Button 
-                  variant="ghost" 
-                  type="button" 
-                  onClick={() => setIsSignUp(true)}
-                  className="w-full text-slate-500 rounded-2xl h-12 hover:bg-slate-50 font-medium"
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 text-lg font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
                 >
-                  Ainda não tem conta? <span className="text-slate-900 font-bold ml-1 hover:underline">Cadastre-se</span>
+                  {loading ? "Processando..." : (isSignUp ? "Concluir Cadastro" : "Acessar Agora")}
                 </Button>
-              )}
-            </div>
-          </form>
+                
+                {!isSignUp && (
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPassword(true)}
+                    className="text-sm text-slate-500 hover:text-slate-700 font-medium py-2 transition-colors"
+                  >
+                    Esqueceu sua senha?
+                  </button>
+                )}
+                
+                {!isSignUp && (
+                  <Button 
+                    variant="ghost" 
+                    type="button" 
+                    onClick={() => setIsSignUp(true)}
+                    className="w-full text-slate-500 rounded-2xl h-12 hover:bg-slate-50 font-medium"
+                  >
+                    Ainda não tem conta? <span className="text-slate-900 font-bold ml-1 hover:underline">Cadastre-se</span>
+                  </Button>
+                )}
+              </div>
+            </form>
+          )}
         </CardContent>
       </Card>
       
