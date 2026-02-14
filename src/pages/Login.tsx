@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, EyeOff, Mail } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, ExternalLink, Copy } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -56,7 +56,12 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCurrentUrl(window.location.origin);
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +88,7 @@ const Login = () => {
         });
         
         if (error) throw error;
-        toast.success("Cadastro realizado! Verifique seu e-mail para confirmar a conta.");
+        toast.success("Cadastro realizado! Verifique seu e-mail.");
         setNeedsConfirmation(true);
         setIsSignUp(false);
       } else {
@@ -95,12 +100,12 @@ const Login = () => {
         if (error) {
           if (error.message.includes("Email not confirmed")) {
             setNeedsConfirmation(true);
-            throw new Error("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
+            throw new Error("E-mail não confirmado.");
           }
           throw error;
         }
         
-        toast.success("Login realizado com sucesso!");
+        toast.success("Login realizado!");
         navigate("/");
       }
     } catch (error: any) {
@@ -110,9 +115,14 @@ const Login = () => {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("URL copiada!");
+  };
+
   const handleResendConfirmation = async () => {
     if (!email) {
-      toast.error("Por favor, informe seu e-mail primeiro.");
+      toast.error("Informe seu e-mail.");
       return;
     }
     
@@ -127,26 +137,7 @@ const Login = () => {
       });
       
       if (error) throw error;
-      toast.success("E-mail de confirmação reenviado!");
-    } catch (error: any) {
-      toast.error("Erro ao reenviar: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback`
-      });
-      
-      if (error) throw error;
-      toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
-      setIsForgotPassword(false);
+      toast.success("E-mail reenviado!");
     } catch (error: any) {
       toast.error("Erro: " + error.message);
     } finally {
@@ -161,59 +152,22 @@ const Login = () => {
           <button 
             onClick={() => setIsForgotPassword(false)}
             className="absolute left-6 top-8 p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors z-10"
-            title="Voltar para o login"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          
-          <div className="flex justify-center px-8 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <div className="w-full max-w-[180px] relative overflow-hidden rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white">
-              <img src="/nova-jornada.jpg" alt="Jornada Bíblica 2026" className="w-full h-full object-contain" />
-            </div>
-          </div>
-          
-          <CardHeader className="space-y-1 text-center px-8 pb-4">
-            <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">
-              Recuperar Senha
-            </CardTitle>
-            <CardDescription className="text-slate-500 font-medium">
-              Informe seu e-mail para receber instruções
-            </CardDescription>
+          <CardHeader className="text-center px-8 pb-4">
+            <CardTitle className="text-2xl font-black text-slate-800">Recuperar Senha</CardTitle>
           </CardHeader>
-          
           <CardContent className="px-8 pb-10">
-            <form onSubmit={handleForgotPassword} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); toast.info("Funcionalidade em desenvolvimento"); }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-600 font-semibold ml-1">E-mail</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="seu@email.com" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
-                  className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
-                />
+                <Label htmlFor="email">E-mail</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-2xl h-12 bg-slate-50" />
               </div>
-              
-              <div className="flex flex-col gap-3 pt-4">
-                <Button 
-                  type="submit" 
-                  disabled={loading}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 text-lg font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
-                >
-                  {loading ? "Enviando..." : "Enviar Instruções"}
-                </Button>
-              </div>
+              <Button type="submit" className="w-full bg-slate-900 rounded-2xl h-14 font-bold">Enviar Instruções</Button>
             </form>
           </CardContent>
         </Card>
-        
-        <footer className="mt-8 text-center space-y-2">
-          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-            © 2026 Jornada Bíblica • Assembleia de Deus
-          </p>
-        </footer>
       </div>
     );
   }
@@ -223,85 +177,70 @@ const Login = () => {
       <Card className="w-full max-w-md border-none shadow-2xl relative overflow-hidden rounded-[2.5rem] bg-white pt-10">
         {(isSignUp || needsConfirmation) && (
           <button 
-            onClick={() => {
-              setIsSignUp(false);
-              setNeedsConfirmation(false);
-            }}
+            onClick={() => { setIsSignUp(false); setNeedsConfirmation(false); }}
             className="absolute left-6 top-8 p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors z-10"
-            title="Voltar para o login"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         )}
         
-        <div className="flex justify-center px-8 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <div className="w-full max-w-[180px] relative overflow-hidden rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white">
-            <img src="/nova-jornada.jpg" alt="Jornada Bíblica 2026" className="w-full h-full object-contain" />
+        <div className="flex justify-center px-8 mb-4">
+          <div className="w-full max-w-[180px] rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white overflow-hidden">
+            <img src="/nova-jornada.jpg" alt="Logo" className="w-full h-full object-contain" />
           </div>
         </div>
         
-        <CardHeader className="space-y-1 text-center px-8 pb-4">
-          <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">
+        <CardHeader className="text-center px-8 pb-4">
+          <CardTitle className="text-2xl font-black text-slate-800">
             {needsConfirmation ? "Confirme seu E-mail" : isSignUp ? "Criar Conta" : "Entrar na Jornada"}
           </CardTitle>
-          <CardDescription className="text-slate-500 font-medium">
-            {needsConfirmation 
-              ? "Enviamos um link de ativação para você" 
-              : isSignUp 
-                ? "Preencha seus dados para começar" 
-                : "AD Jaraguá do Sul"}
-          </CardDescription>
         </CardHeader>
         
         <CardContent className="px-8 pb-10">
           {needsConfirmation ? (
-            <div className="space-y-6 text-center">
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+            <div className="space-y-6">
+              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
+                <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
+                  <ExternalLink size={16} />
+                  Configuração Necessária
+                </div>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  Se o link no e-mail ainda abrir "localhost", você precisa configurar a URL abaixo no painel do Supabase (Auth {"->"} URL Configuration):
+                </p>
+                <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-amber-200">
+                  <code className="text-[10px] flex-1 truncate font-mono">{currentUrl}</code>
+                  <button onClick={() => copyToClipboard(currentUrl)} className="p-1 hover:bg-slate-100 rounded-md">
+                    <Copy size={14} className="text-slate-400" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 text-center">
                 <Mail className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Verifique sua caixa de entrada (e a pasta de spam) para o e-mail de confirmação.
-                </p>
+                <p className="text-sm text-slate-600">Verifique sua caixa de entrada.</p>
               </div>
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleResendConfirmation}
-                  disabled={loading}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-12 font-bold transition-all"
-                >
-                  {loading ? "Reenviando..." : "Reenviar E-mail"}
-                </Button>
-                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                  Importante: O link no e-mail pode levar alguns minutos para chegar.
-                </p>
-              </div>
+              
+              <Button onClick={handleResendConfirmation} disabled={loading} className="w-full bg-slate-900 rounded-2xl h-12 font-bold">
+                {loading ? "Reenviando..." : "Reenviar E-mail"}
+              </Button>
             </div>
           ) : (
             <form onSubmit={handleAuth} className="space-y-4">
               {isSignUp && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-slate-600 font-semibold ml-1">Nome Completo</Label>
-                    <Input 
-                      id="firstName" 
-                      type="text" 
-                      placeholder="Seu nome" 
-                      value={firstName} 
-                      onChange={(e) => setFirstName(e.target.value)} 
-                      required 
-                      className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
-                    />
+                    <Label htmlFor="firstName">Nome Completo</Label>
+                    <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="rounded-2xl h-12 bg-slate-50" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="congregation" className="text-slate-600 font-semibold ml-1">Congregação</Label>
+                    <Label htmlFor="congregation">Congregação</Label>
                     <Select onValueChange={setCongregation} value={congregation} required>
-                      <SelectTrigger className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all">
-                        <SelectValue placeholder="Selecione sua congregação" />
+                      <SelectTrigger className="rounded-2xl h-12 bg-slate-50">
+                        <SelectValue placeholder="Selecione" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-2xl border-slate-100 shadow-xl max-h-[300px]">
+                      <SelectContent className="rounded-2xl max-h-[300px]">
                         {CONGREGATIONS.map((name) => (
-                          <SelectItem key={name} value={name} className="rounded-xl focus:bg-slate-50">
-                            {name}
-                          </SelectItem>
+                          <SelectItem key={name} value={name}>{name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -310,29 +249,20 @@ const Login = () => {
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-600 font-semibold ml-1">E-mail</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="seu@email.com" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
-                  className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
-                />
+                <Label htmlFor="email">E-mail</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-2xl h-12 bg-slate-50" />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-600 font-semibold ml-1">Senha</Label>
+                <Label htmlFor="password">Senha</Label>
                 <div className="relative">
                   <Input 
                     id="password" 
                     type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
-                    className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all pr-12" 
+                    className="rounded-2xl h-12 bg-slate-50 pr-12" 
                   />
                   <button
                     type="button"
@@ -341,8 +271,7 @@ const Login = () => {
                     onMouseLeave={() => setShowPassword(false)}
                     onTouchStart={() => setShowPassword(true)}
                     onTouchEnd={() => setShowPassword(false)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
-                    title="Pressione para ver a senha"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -350,32 +279,13 @@ const Login = () => {
               </div>
               
               <div className="flex flex-col gap-3 pt-4">
-                <Button 
-                  type="submit" 
-                  disabled={loading}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 text-lg font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
-                >
+                <Button type="submit" disabled={loading} className="w-full bg-slate-900 rounded-2xl h-14 text-lg font-bold shadow-lg">
                   {loading ? "Processando..." : (isSignUp ? "Concluir Cadastro" : "Acessar Agora")}
                 </Button>
                 
                 {!isSignUp && (
-                  <button
-                    type="button"
-                    onClick={() => setIsForgotPassword(true)}
-                    className="text-sm text-slate-500 hover:text-slate-700 font-medium py-2 transition-colors"
-                  >
-                    Esqueceu sua senha?
-                  </button>
-                )}
-                
-                {!isSignUp && (
-                  <Button 
-                    variant="ghost" 
-                    type="button" 
-                    onClick={() => setIsSignUp(true)}
-                    className="w-full text-slate-500 rounded-2xl h-12 hover:bg-slate-50 font-medium"
-                  >
-                    Ainda não tem conta? <span className="text-slate-900 font-bold ml-1 hover:underline">Cadastre-se</span>
+                  <Button variant="ghost" type="button" onClick={() => setIsSignUp(true)} className="w-full text-slate-500 rounded-2xl h-12">
+                    Ainda não tem conta? <span className="text-slate-900 font-bold ml-1">Cadastre-se</span>
                   </Button>
                 )}
               </div>
@@ -383,12 +293,6 @@ const Login = () => {
           )}
         </CardContent>
       </Card>
-      
-      <footer className="mt-8 text-center space-y-2">
-        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-          © 2026 Jornada Bíblica • Assembleia de Deus
-        </p>
-      </footer>
     </div>
   );
 };
