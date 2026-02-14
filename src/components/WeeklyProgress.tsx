@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import WeekButton from "./WeekButton";
 import { toast } from "sonner";
-import { Loader2, Trophy, Sparkles } from "lucide-react";
+import { Loader2, Crown, Sparkles } from "lucide-react";
+import confetti from "canvas-confetti";
 
 const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number) => void }) => {
   const [completedWeeks, setCompletedWeeks] = useState<Set<number>>(new Set());
@@ -17,6 +18,40 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
   useEffect(() => {
     fetchProgress();
   }, []);
+
+  // Disparar confetes quando completar tudo
+  useEffect(() => {
+    if (isAllCompleted && !loading) {
+      const duration = 5 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+      const interval: any = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        });
+      }, 250);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAllCompleted, loading]);
 
   const fetchProgress = async () => {
     try {
@@ -144,7 +179,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       {isAllCompleted && (
         <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-amber-50 to-white rounded-[2.5rem] border-2 border-amber-200 animate-in zoom-in duration-500 shadow-xl shadow-amber-100/50">
           <div className="relative">
-            <Trophy className="w-24 h-24 text-amber-500 animate-bounce" />
+            <Crown className="w-24 h-24 text-amber-500 animate-bounce" />
             <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-amber-400 animate-pulse" />
             <Sparkles className="absolute -bottom-2 -left-2 w-6 h-6 text-amber-300 animate-pulse delay-75" />
           </div>
