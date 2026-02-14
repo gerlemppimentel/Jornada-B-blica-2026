@@ -1,16 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Fundo arredondado no tom azul escuro do app -->
-  <rect width="512" height="512" rx="120" fill="#0f172a"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="#0F172A"/>
+  <!-- Páginas da Bíblia -->
+  <path d="M256 380C200 380 140 410 100 430V130C140 110 200 80 256 80C312 80 372 110 412 130V430C372 410 312 380 256 380Z" fill="white"/>
+  <!-- Divisória central -->
+  <path d="M256 80V380" stroke="#CBD5E1" stroke-width="8" stroke-linecap="round"/>
   
-  <!-- Corpo da Bíblia -->
-  <path d="M160 96h224a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H160a64 64 0 0 1-64-64V160a64 64 0 0 1 64-64z" fill="#ffffff"/>
+  <!-- Linhas de texto na página esquerda -->
+  <path d="M130 180H210M130 220H210M130 260H210M130 300H170" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round"/>
   
-  <!-- Detalhe das páginas na base -->
-  <path d="M160 352h224v32H160a32 32 0 0 1-32-32v-32a32 32 0 0 1 32 32z" fill="#cbd5e1"/>
-  
-  <!-- Cruz centralizada -->
-  <g transform="translate(256, 220)">
-    <rect x="-8" y="-60" width="16" height="120" rx="4" fill="#0f172a"/>
-    <rect x="-40" y="-20" width="80" height="16" rx="4" fill="#0f172a"/>
-  </g>
+  <!-- Linhas de texto na página direita -->
+  <path d="M300 180H380M300 220H380M300 260H380M300 300H340" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round"/>
 </svg>
