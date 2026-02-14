@@ -113,6 +113,9 @@ const Login = () => {
             setNeedsConfirmation(true);
             throw new Error("E-mail não confirmado.");
           }
+          if (error.message === "Invalid login credentials") {
+            throw new Error("e-mail ou senha incorretos. Tente novamente");
+          }
           throw error;
         }
         
