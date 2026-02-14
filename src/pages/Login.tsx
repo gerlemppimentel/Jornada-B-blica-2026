@@ -30,6 +30,7 @@ const Login = () => {
           email,
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: {
               first_name: firstName,
               congregation: congregation,
@@ -38,7 +39,7 @@ const Login = () => {
         });
         
         if (error) throw error;
-        toast.success("Cadastro realizado! Você já pode entrar.");
+        toast.success("Cadastro realizado! Verifique seu e-mail para confirmar a conta.");
         setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -63,7 +64,7 @@ const Login = () => {
     
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/login`
+        redirectTo: `${window.location.origin}/auth/callback`
       });
       
       if (error) throw error;
@@ -153,7 +154,6 @@ const Login = () => {
           </button>
         )}
         
-        {/* Imagem de Abertura agora dentro da moldura branca */}
         <div className="flex justify-center px-8 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <div className="w-full max-w-[180px] relative overflow-hidden rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white">
             <img src="/nova-jornada.jpg" alt="Jornada Bíblica 2026" className="w-full h-full object-contain" />
