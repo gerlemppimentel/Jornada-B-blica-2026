@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import WeekButton from "./WeekButton";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trophy, Sparkles } from "lucide-react";
 
 const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number) => void }) => {
   const [completedWeeks, setCompletedWeeks] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<number | null>(null);
+
+  const totalWeeks = 47;
+  const isAllCompleted = completedWeeks.size === totalWeeks;
 
   useEffect(() => {
     fetchProgress();
@@ -47,9 +50,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
     const isAdding = !completedWeeks.has(week);
     const weekLabel = `Semana ${week}`;
 
-    // Verificação para marcação sequencial
     if (isAdding) {
-      // Encontrar a última semana concluída
       let lastCompleted = 0;
       for (let i = week - 1; i >= 1; i--) {
         if (completedWeeks.has(i)) {
@@ -58,7 +59,6 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
         }
       }
 
-      // Verificar se está tentando marcar uma semana que não é sequencial
       if (lastCompleted < week - 1) {
         toast.error(`Você precisa concluir a semana ${week - 1} primeiro!`);
         setSyncing(null);
@@ -71,7 +71,6 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       if (!user) return;
 
       if (isAdding) {
-        // Usamos upsert para evitar erro de duplicata caso o registro já exista no banco
         const { error } = await supabase
           .from("readings")
           .upsert(
@@ -84,7 +83,6 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
 
         if (error) throw error;
       } else {
-        // Permitir desmarcar apenas a última semana marcada
         const maxCompleted = Math.max(...Array.from(completedWeeks));
         if (week !== maxCompleted && completedWeeks.size > 0) {
           toast.error("Você só pode desmarcar a última semana concluída!");
@@ -101,7 +99,6 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
         if (error) throw error;
       }
 
-      // Atualiza o estado local apenas após sucesso no banco
       setCompletedWeeks(prev => {
         const next = new Set(prev);
         if (isAdding) next.add(week);
@@ -112,7 +109,6 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
 
       toast.success(`${weekLabel} ${isAdding ? 'concluída!' : 'desmarcada.'}`);
     } catch (error: any) {
-      // Se for erro de duplicata, apenas sincronizamos o estado local
       if (error.code === '23505') {
         fetchProgress();
       } else {
@@ -132,16 +128,32 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
   }
 
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 sm:gap-4">
-      {Array.from({ length: 47 }, (_, i) => i + 1).map((week) => (
-        <WeekButton 
-          key={week} 
-          week={week} 
-          isCompleted={completedWeeks.has(week)} 
-          onClick={toggleWeek} 
-          disabled={syncing === week} 
-        />
-      ))}
+    <div className="space-y-8">
+      <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 sm:gap-4">
+        {Array.from({ length: totalWeeks }, (_, i) => i + 1).map((week) => (
+          <WeekButton 
+            key={week} 
+            week={week} 
+            isCompleted={completedWeeks.has(week)} 
+            onClick={toggleWeek} 
+            disabled={syncing === week} 
+          />
+        ))}
+      </div>
+
+      {isAllCompleted && (
+        <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-amber-50 to-white rounded-[2.5rem] border-2 border-amber-200 animate-in zoom-in duration-500 shadow-xl shadow-amber-100/50">
+          <div className="relative">
+            <Trophy className="w-24 h-24 text-amber-500 animate-bounce" />
+            <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-amber-400 animate-pulse" />
+            <Sparkles className="absolute -bottom-2 -left-2 w-6 h-6 text-amber-300 animate-pulse delay-75" />
+          </div>
+          <h3 className="text-2xl font-black text-amber-900 mt-4 text-center">Jornada Concluída!</h3>
+          <p className="text-amber-700 font-medium text-center mt-2">
+            Parabéns! Você completou todas as 47 semanas da Jornada Bíblica 2026.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
