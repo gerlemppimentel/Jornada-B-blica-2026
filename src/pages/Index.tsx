@@ -85,7 +85,7 @@ const Index = () => {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 space-y-8">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-slate-900">
-            Bem-Vindo{userName ? `, ${userName}` : ""}!
+            Bem-Vindo(a){userName ? `, ${userName}` : ""}!
           </h1>
           <p className="text-slate-500">Acompanhe sua jornada semanal através da Palavra.</p>
         </div>
