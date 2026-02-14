@@ -6,6 +6,7 @@ import WeekButton from "./WeekButton";
 import { toast } from "sonner";
 import { Loader2, Crown, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
+import { playToc, playPo } from "@/utils/audio";
 
 const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number) => void }) => {
   const [completedWeeks, setCompletedWeeks] = useState<Set<number>>(new Set());
@@ -117,6 +118,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           );
 
         if (error) throw error;
+        playToc(); // Som de marcação
       } else {
         const maxCompleted = Math.max(...Array.from(completedWeeks));
         if (week !== maxCompleted && completedWeeks.size > 0) {
@@ -132,6 +134,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           .eq("book_name", weekLabel);
 
         if (error) throw error;
+        playPo(); // Som de desmarcação
       }
 
       setCompletedWeeks(prev => {
