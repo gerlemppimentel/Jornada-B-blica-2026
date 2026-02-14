@@ -10,15 +10,15 @@ import { playToc, playPo } from "@/utils/audio";
 import PhaseCompletionModal from "./PhaseCompletionModal";
 
 const PHASES = [
-  { end: 10, name: "Pentateuco" },
-  { end: 20, name: "Livros Históricos" },
-  { end: 26, name: "Livros Poéticos" },
-  { end: 32, name: "Profetas Maiores" },
-  { end: 35, name: "Profetas Menores" },
-  { end: 39, name: "Evangelhos" },
-  { end: 40, name: "História Eclesiástica (Atos)" },
-  { end: 46, name: "Epístolas Apostólicas" },
-  { end: 47, name: "Livro Profético" }
+  { end: 10, name: "Pentateuco", gem: "Jaspe", color: "#E57373" },
+  { end: 20, name: "Livros Históricos", gem: "Sardônica", color: "#FFB74D" },
+  { end: 26, name: "Livros Poéticos", gem: "Sárdio", color: "#D32F2F" },
+  { end: 32, name: "Profetas Maiores", gem: "Ametista", color: "#9575CD" },
+  { end: 35, name: "Profetas Menores", gem: "Crisólito", color: "#AED581" },
+  { end: 39, name: "Evangelhos", gem: "Jacinto", color: "#FF8A65" },
+  { end: 40, name: "História Eclesiástica (Atos)", gem: "Topázio", color: "#FFD54F" },
+  { end: 46, name: "Epístolas Apostólicas", gem: "Berilo", color: "#4DB6AC" },
+  { end: 47, name: "Livro Profético", gem: "Safira", color: "#64B5F6" }
 ];
 
 const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number) => void }) => {
@@ -26,7 +26,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<number | null>(null);
   const [showPhaseModal, setShowPhaseModal] = useState(false);
-  const [currentPhaseName, setCurrentPhaseName] = useState("");
+  const [currentPhase, setCurrentPhase] = useState(PHASES[0]);
 
   const totalWeeks = 47;
   const isAllCompleted = completedWeeks.size === totalWeeks;
@@ -139,7 +139,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
         // Verificar se concluiu uma fase
         const phase = PHASES.find(p => p.end === week);
         if (phase) {
-          setCurrentPhaseName(phase.name);
+          setCurrentPhase(phase);
           setShowPhaseModal(true);
         }
       } else {
@@ -193,7 +193,9 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       <PhaseCompletionModal 
         isOpen={showPhaseModal} 
         onClose={() => setShowPhaseModal(false)} 
-        phaseName={currentPhaseName} 
+        phaseName={currentPhase.name}
+        gemName={currentPhase.gem}
+        gemColor={currentPhase.color}
       />
 
       <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 sm:gap-4">
@@ -213,19 +215,19 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           <div className="relative">
             <Crown className="w-24 h-24 text-amber-500 animate-bounce" />
             
-            {/* Safiras encrustadas na coroa */}
-            <div className="absolute top-[42%] left-[18%] w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
-            <div className="absolute top-[32%] left-[46%] w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse delay-75" />
-            <div className="absolute top-[42%] right-[18%] w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse delay-150" />
-            <div className="absolute bottom-[28%] left-[32%] w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-            <div className="absolute bottom-[28%] right-[32%] w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+            {/* Pedras preciosas encrustadas na coroa final */}
+            <div className="absolute top-[42%] left-[18%] w-2 h-2 bg-[#E57373] rounded-full shadow-[0_0_8px_rgba(229,115,115,0.8)] animate-pulse" />
+            <div className="absolute top-[32%] left-[46%] w-2 h-2 bg-[#64B5F6] rounded-full shadow-[0_0_8px_rgba(100,181,246,0.8)] animate-pulse delay-75" />
+            <div className="absolute top-[42%] right-[18%] w-2 h-2 bg-[#9575CD] rounded-full shadow-[0_0_8px_rgba(149,117,205,0.8)] animate-pulse delay-150" />
+            <div className="absolute bottom-[28%] left-[32%] w-1.5 h-1.5 bg-[#FFD54F] rounded-full shadow-[0_0_5px_rgba(255,213,79,0.5)]" />
+            <div className="absolute bottom-[28%] right-[32%] w-1.5 h-1.5 bg-[#4DB6AC] rounded-full shadow-[0_0_5px_rgba(77,182,172,0.5)]" />
             
             <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-amber-400 animate-pulse" />
             <Sparkles className="absolute -bottom-2 -left-2 w-6 h-6 text-amber-300 animate-pulse delay-75" />
           </div>
           <h3 className="text-2xl font-black text-amber-900 mt-4 text-center">Jornada Concluída!</h3>
           <p className="text-amber-700 font-medium text-center mt-2">
-            Parabéns! Você completou todas as 47 semanas da Jornada Bíblica 2026.
+            Parabéns! Você completou todas as 47 semanas e coletou todas as pedras preciosas da Jornada Bíblica 2026.
           </p>
         </div>
       )}
