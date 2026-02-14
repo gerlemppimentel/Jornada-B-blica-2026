@@ -7,11 +7,26 @@ import { toast } from "sonner";
 import { Loader2, Crown, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
 import { playToc, playPo } from "@/utils/audio";
+import PhaseCompletionModal from "./PhaseCompletionModal";
+
+const PHASES = [
+  { end: 10, name: "Pentateuco" },
+  { end: 20, name: "Livros Históricos" },
+  { end: 26, name: "Livros Poéticos" },
+  { end: 32, name: "Profetas Maiores" },
+  { end: 35, name: "Profetas Menores" },
+  { end: 39, name: "Evangelhos" },
+  { end: 40, name: "História Eclesiástica (Atos)" },
+  { end: 46, name: "Epístolas Apostólicas" },
+  { end: 47, name: "Livro Profético" }
+];
 
 const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number) => void }) => {
   const [completedWeeks, setCompletedWeeks] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<number | null>(null);
+  const [showPhaseModal, setShowPhaseModal] = useState(false);
+  const [currentPhaseName, setCurrentPhaseName] = useState("");
 
   const totalWeeks = 47;
   const isAllCompleted = completedWeeks.size === totalWeeks;
@@ -20,39 +35,40 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
     fetchProgress();
   }, []);
 
-  // Disparar confetes quando completar tudo
   useEffect(() => {
     if (isAllCompleted && !loading) {
-      const duration = 5 * 1000;
-      const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-      const interval: any = setInterval(function() {
-        const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
-        const particleCount = 50 * (timeLeft / duration);
-        
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-        });
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-        });
-      }, 250);
-
-      return () => clearInterval(interval);
+      triggerConfetti();
     }
   }, [isAllCompleted, loading]);
+
+  const triggerConfetti = () => {
+    const duration = 5 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
+  };
 
   const fetchProgress = async () => {
     try {
@@ -118,7 +134,14 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           );
 
         if (error) throw error;
-        playToc(); // Som de marcação
+        playToc();
+
+        // Verificar se concluiu uma fase
+        const phase = PHASES.find(p => p.end === week);
+        if (phase) {
+          setCurrentPhaseName(phase.name);
+          setShowPhaseModal(true);
+        }
       } else {
         const maxCompleted = Math.max(...Array.from(completedWeeks));
         if (week !== maxCompleted && completedWeeks.size > 0) {
@@ -134,7 +157,7 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
           .eq("book_name", weekLabel);
 
         if (error) throw error;
-        playPo(); // Som de desmarcação
+        playPo();
       }
 
       setCompletedWeeks(prev => {
@@ -167,6 +190,12 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
 
   return (
     <div className="space-y-8">
+      <PhaseCompletionModal 
+        isOpen={showPhaseModal} 
+        onClose={() => setShowPhaseModal(false)} 
+        phaseName={currentPhaseName} 
+      />
+
       <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 sm:gap-4">
         {Array.from({ length: totalWeeks }, (_, i) => i + 1).map((week) => (
           <WeekButton 
