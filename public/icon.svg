@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fundo arredondado no tom azul escuro do app -->
+  <rect width="512" height="512" rx="120" fill="#0f172a"/>
+  
+  <!-- Corpo da Bíblia -->
+  <path d="M160 96h224a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H160a64 64 0 0 1-64-64V160a64 64 0 0 1 64-64z" fill="#ffffff"/>
+  
+  <!-- Detalhe das páginas na base -->
+  <path d="M160 352h224v32H160a32 32 0 0 1-32-32v-32a32 32 0 0 1 32 32z" fill="#cbd5e1"/>
+  
+  <!-- Cruz centralizada -->
+  <g transform="translate(256, 220)">
+    <rect x="-8" y="-60" width="16" height="120" rx="4" fill="#0f172a"/>
+    <rect x="-40" y="-20" width="80" height="16" rx="4" fill="#0f172a"/>
+  </g>
+</svg>
