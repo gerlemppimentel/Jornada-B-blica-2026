@@ -212,6 +212,14 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
         <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-amber-50 to-white rounded-[2.5rem] border-2 border-amber-200 animate-in zoom-in duration-500 shadow-xl shadow-amber-100/50">
           <div className="relative">
             <Crown className="w-24 h-24 text-amber-500 animate-bounce" />
+            
+            {/* Safiras encrustadas na coroa */}
+            <div className="absolute top-[42%] left-[18%] w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
+            <div className="absolute top-[32%] left-[46%] w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse delay-75" />
+            <div className="absolute top-[42%] right-[18%] w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse delay-150" />
+            <div className="absolute bottom-[28%] left-[32%] w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+            <div className="absolute bottom-[28%] right-[32%] w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+            
             <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-amber-400 animate-pulse" />
             <Sparkles className="absolute -bottom-2 -left-2 w-6 h-6 text-amber-300 animate-pulse delay-75" />
           </div>
