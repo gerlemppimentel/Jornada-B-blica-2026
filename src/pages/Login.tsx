@@ -9,6 +9,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const CONGREGATIONS = [
+  "Amizade",
+  "Barra do Rio Cerro",
+  "Chocoleite",
+  "Ebenezer",
+  "Estrada Nova",
+  "Firenze",
+  "Ilha da Figueira",
+  "Jaraguá 84",
+  "Jaraguazinho",
+  "João Pessoa",
+  "Monte Sião",
+  "Monte Sinai",
+  "Nereu Ramos",
+  "Nova Jerusalém",
+  "Rau",
+  "Rio da Luz",
+  "Rio Molha",
+  "São Luiz",
+  "Schimidt",
+  "Sede",
+  "Shalon",
+  "Souza",
+  "Três Rios do Norte",
+  "Três Rios do Sul",
+  "Vieira",
+  "Vila Lalau"
+];
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +59,12 @@ const Login = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSignUp && !congregation) {
+      toast.error("Por favor, selecione sua congregação.");
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -188,15 +230,18 @@ const Login = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="congregation" className="text-slate-600 font-semibold ml-1">Congregação</Label>
-                  <Input 
-                    id="congregation" 
-                    type="text" 
-                    placeholder="Ex: Central" 
-                    value={congregation} 
-                    onChange={(e) => setCongregation(e.target.value)} 
-                    required 
-                    className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all" 
-                  />
+                  <Select onValueChange={setCongregation} value={congregation} required>
+                    <SelectTrigger className="rounded-2xl h-12 bg-slate-50 border-slate-100 focus:bg-white transition-all">
+                      <SelectValue placeholder="Selecione sua congregação" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-slate-100 shadow-xl max-h-[300px]">
+                      {CONGREGATIONS.map((name) => (
+                        <SelectItem key={name} value={name} className="rounded-xl focus:bg-slate-50">
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </>
             )}
