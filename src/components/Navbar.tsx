@@ -50,7 +50,7 @@ const Navbar = () => {
                 <div className="space-y-4 py-4">
                   <div className="space-y-1">
                     <p className="font-bold text-slate-900 text-lg">Jornada Bíblica 2026 1.0</p>
-                    <p className="text-slate-500 font-medium">Assembleia de Deus em Jaraguá do Sul</p>
+                    <p className="text-slate-500 font-medium">Assembleia de Deus em Jaraguá do Sul - Santa Catarina</p>
                   </div>
                   <div className="pt-4 border-t border-slate-100 space-y-2">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Desenvolvedor</p>
