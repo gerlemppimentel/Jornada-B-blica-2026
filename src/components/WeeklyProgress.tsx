@@ -8,6 +8,7 @@ import { Loader2, Crown, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
 import { playToc, playPo } from "@/utils/audio";
 import PhaseCompletionModal from "./PhaseCompletionModal";
+import { cn } from "@/lib/utils";
 
 const PHASES = [
   { end: 10, name: "Pentateuco", gem: "Jaspe", color: "#E57373" },
@@ -188,6 +189,19 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
     );
   }
 
+  // Posições estratégicas para as 9 pedras na coroa
+  const gemPositions = [
+    "top-[42%] left-[18%]",   // Jaspe
+    "top-[32%] left-[32%]",   // Sardônica
+    "top-[28%] left-[48%]",   // Sárdio
+    "top-[32%] right-[32%]",  // Ametista
+    "top-[42%] right-[18%]",  // Crisólito
+    "bottom-[38%] left-[28%]",// Jacinto
+    "bottom-[38%] left-[48%]",// Topázio
+    "bottom-[38%] right-[28%]",// Berilo
+    "bottom-[22%] left-[48%]" // Safira
+  ];
+
   return (
     <div className="space-y-8">
       <PhaseCompletionModal 
@@ -216,11 +230,20 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
             <Crown className="w-24 h-24 text-amber-500 animate-bounce" />
             
             {/* Pedras preciosas encrustadas na coroa final */}
-            <div className="absolute top-[42%] left-[18%] w-2 h-2 bg-[#E57373] rounded-full shadow-[0_0_8px_rgba(229,115,115,0.8)] animate-pulse" />
-            <div className="absolute top-[32%] left-[46%] w-2 h-2 bg-[#64B5F6] rounded-full shadow-[0_0_8px_rgba(100,181,246,0.8)] animate-pulse delay-75" />
-            <div className="absolute top-[42%] right-[18%] w-2 h-2 bg-[#9575CD] rounded-full shadow-[0_0_8px_rgba(149,117,205,0.8)] animate-pulse delay-150" />
-            <div className="absolute bottom-[28%] left-[32%] w-1.5 h-1.5 bg-[#FFD54F] rounded-full shadow-[0_0_5px_rgba(255,213,79,0.5)]" />
-            <div className="absolute bottom-[28%] right-[32%] w-1.5 h-1.5 bg-[#4DB6AC] rounded-full shadow-[0_0_5px_rgba(77,182,172,0.5)]" />
+            {PHASES.map((phase, index) => (
+              <div 
+                key={phase.gem}
+                className={cn(
+                  "absolute w-2 h-2 rounded-full shadow-lg animate-pulse",
+                  gemPositions[index]
+                )}
+                style={{ 
+                  backgroundColor: phase.color,
+                  boxShadow: `0 0 8px ${phase.color}cc`,
+                  animationDelay: `${index * 150}ms`
+                }}
+              />
+            ))}
             
             <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-amber-400 animate-pulse" />
             <Sparkles className="absolute -bottom-2 -left-2 w-6 h-6 text-amber-300 animate-pulse delay-75" />
