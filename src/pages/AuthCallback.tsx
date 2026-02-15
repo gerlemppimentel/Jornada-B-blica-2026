@@ -23,10 +23,8 @@ const AuthCallback = () => {
 
       if (session) {
         setStatus("success");
-        // Redireciona após 3 segundos
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
+        // Redireciona imediatamente após o sucesso
+        navigate("/");
       } else {
         // Se não houver sessão, pode ser que o link expirou ou já foi usado
         setStatus("error");
@@ -54,11 +52,11 @@ const AuthCallback = () => {
         <CardContent className="space-y-6">
           <p className="text-slate-500 font-medium">
             {status === "loading" && "Estamos validando sua conta na Jornada Bíblica 2026."}
-            {status === "success" && "Sua conta foi ativada com sucesso. Você será redirecionado para o início em instantes."}
+            {status === "success" && "Sua conta foi ativada com sucesso. Redirecionando..."}
             {status === "error" && "O link de confirmação pode ter expirado ou já foi utilizado. Tente fazer login novamente."}
           </p>
           
-          {(status === "success" || status === "error") && (
+          {status === "error" && (
             <Button 
               onClick={() => navigate("/login")}
               className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-12 font-bold"
