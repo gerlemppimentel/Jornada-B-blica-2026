@@ -194,8 +194,8 @@ const Login = () => {
         )}
         
         <div className="flex justify-center px-8 mb-4">
-          <div className="w-full max-w-[180px] rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white overflow-hidden">
-            <img src="/app-logo.jpg" alt="Logo" className="w-full h-full object-contain" />
+          <div className="w-full max-w-[220px] rounded-[2rem] shadow-lg border-2 border-slate-50 aspect-square bg-white overflow-hidden">
+            <img src="/app-logo.jpg" alt="Logo Jornada Bíblica" className="w-full h-full object-cover" />
           </div>
         </div>
         
