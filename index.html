@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Registre e acompanhe seu progresso" />
+    <meta name="description" content="Registre e acompanhe o avanço de sua Jornada Bíblica 2026" />
     
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,7 +16,7 @@
     <link rel="icon" type="image/jpeg" href="/icon-android.jpg" />
     <link rel="apple-touch-icon" href="/icon-android.jpg">
     
-    <title>Aplicativo Jornada Bíblica 2026</title>
+    <title>Jornada Bíblica 2026</title>
   </head>
 
   <body>
@@ -25,8 +25,10 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
+          navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('ServiceWorker registrado com sucesso:', reg.scope);
+          }).catch(err => {
+            console.log('Falha ao registrar ServiceWorker:', err);
           });
         });
       }
