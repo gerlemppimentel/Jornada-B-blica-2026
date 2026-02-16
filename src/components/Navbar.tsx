@@ -2,7 +2,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Info } from "lucide-react";
+import { LogOut, BookOpen, Info, Globe, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -22,6 +22,13 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const partnerSites = [
+    { name: "Timothy School", url: "https://timothyschool.org.br/" },
+    { name: "SBB - Sociedade Bíblica do Brasil", url: "https://www.sbb.com.br/" },
+    { name: "Canal AD Jaraguá do Sul no Youtube", url: "https://www.youtube.com/@adjaraguadosul" },
+    { name: "Canal Sintonize Gospel no Youtube", url: "https://www.youtube.com/@sintonizegospel" },
+  ];
+
   return (
     <nav className="bg-white border-b border-slate-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,7 +42,42 @@ const Navbar = () => {
             </span>
           </div>
           
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4">
+                  <Globe className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sites</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[90vw] max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold text-slate-800">Sites Parceiros</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 py-4">
+                  {partnerSites.map((site) => (
+                    <a
+                      key={site.name}
+                      href={site.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors group"
+                    >
+                      <span className="text-slate-700 font-medium text-sm sm:text-base">{site.name}</span>
+                      <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                    </a>
+                  ))}
+                </div>
+                <DialogFooter className="sm:justify-start">
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary" className="rounded-xl w-full sm:w-auto">
+                      Voltar
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4">
