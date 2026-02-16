@@ -1,6 +1,7 @@
 {
   "short_name": "Jornada 2026",
   "name": "Jornada Bíblica 2026",
+  "description": "Registre e acompanhe o avanço de sua Jornada Bíblica 2026",
   "icons": [
     {
       "src": "/icon-android.jpg",
@@ -16,6 +17,7 @@
   ],
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#0f172a",
   "background_color": "#f8fafc"
 }
