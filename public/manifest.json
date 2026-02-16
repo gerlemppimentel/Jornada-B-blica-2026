@@ -1,19 +1,26 @@
 {
+  "id": "jornada-biblica-2026",
   "short_name": "Jornada 2026",
   "name": "Jornada Bíblica 2026",
   "description": "Registre e acompanhe o avanço de sua Jornada Bíblica 2026",
   "icons": [
     {
-      "src": "/icon-android.jpg",
+      "src": "icon-android.jpg",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "/icon-android.jpg",
+      "src": "icon-android.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-android.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ],
   "start_url": "/",
@@ -21,5 +28,6 @@
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#0f172a",
-  "background_color": "#f8fafc"
+  "background_color": "#f8fafc",
+  "prefer_related_applications": false
 }

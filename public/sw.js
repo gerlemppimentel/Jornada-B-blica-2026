@@ -1,13 +1,42 @@
-// Service Worker básico para permitir a instalação do PWA
+const CACHE_NAME = 'jornada-biblica-v1';
+const ASSETS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-android.jpg'
+];
+
+// Instalação: Cacheia os recursos essenciais
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
   self.skipWaiting();
 });
 
+// Ativação: Limpa caches antigos
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
 });
 
+// Fetch: Estratégia Cache-First com fallback para Rede
 self.addEventListener('fetch', (event) => {
-  // Estratégia de rede apenas para manter o PWA funcional como instalável
-  event.respondWith(fetch(event.request));
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
 });

@@ -26,9 +26,9 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('ServiceWorker registrado com sucesso:', reg.scope);
+            console.log('PWA: ServiceWorker ativo');
           }).catch(err => {
-            console.log('Falha ao registrar ServiceWorker:', err);
+            console.log('PWA: Erro no SW', err);
           });
         });
       }
