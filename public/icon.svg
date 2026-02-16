@@ -1,21 +1,5 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <rect width="512" height="512" rx="128" fill="#f8fafc"/>
-  <defs>
-    <clipPath id="clip">
-      <rect width="512" height="512" rx="128" />
-    </clipPath>
-  </defs>
-  <g clip-path="url(#clip)">
-    <!-- Usando a imagem carregada centralizada no ícone quadrado -->
-    <image 
-      href="/app-icon.jpg" 
-      x="-100" 
-      y="0" 
-      width="712" 
-      height="512" 
-      preserveAspectRatio="xMidYMid slice"
-    />
-  </g>
-  <!-- Borda sutil para dar acabamento -->
-  <rect x="2" y="2" width="508" height="508" rx="126" stroke="#e2e8f0" stroke-width="4" fill="none" />
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#4B5563"/>
+  <text x="50%" y="42%" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="220" fill="#D4AF37">JB</text>
+  <text x="50%" y="75%" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="110" fill="#D4AF37">2026</text>
 </svg>
