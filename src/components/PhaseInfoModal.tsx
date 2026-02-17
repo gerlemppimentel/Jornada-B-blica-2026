@@ -49,7 +49,7 @@ const PhaseInfoModal = ({ isOpen, onClose, title, description, color }: PhaseInf
               onClick={onClose}
               className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 font-bold shadow-lg transition-all active:scale-95"
             >
-              Começar Leitura
+              Siga com a Leitura
             </Button>
           </div>
         </div>
