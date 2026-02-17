@@ -35,17 +35,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-700">
-          <div className="w-64 h-64 rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-slate-50">
-            <img src="/GS.jpeg" alt="Gerlem Software" className="w-full h-full object-cover" />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-slate-800 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="w-2 h-2 bg-slate-800 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="w-2 h-2 bg-slate-800 rounded-full animate-bounce"></div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-800"></div>
       </div>
     );
   }
