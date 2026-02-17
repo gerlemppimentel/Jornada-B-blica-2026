@@ -81,6 +81,35 @@ const Navbar = () => {
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4">
+                  <span className="text-lg font-bold leading-none">˂†˃</span>
+                  <span className="hidden sm:inline">Software</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[90vw] max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-black text-slate-800">Software Cristão</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    Todos os nossos aplicativos tem versículos bíblicos incluídos no Código Fonte que, em algum momento, podem ser lidos por outros programadores.
+                  </p>
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    Fornecer soluções digitais eficientes para igrejas é nosso propósito. Assim colaboramos com o crescimento do Reino de Deus.
+                  </p>
+                </div>
+                <DialogFooter className="sm:justify-start">
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary" className="rounded-xl w-full sm:w-auto">
+                      Voltar
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4">
                   <Info className="w-4 h-4" />
                   <span className="hidden sm:inline">Sobre</span>
                 </Button>
