@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const AuthCallback = () => {
@@ -23,10 +23,9 @@ const AuthCallback = () => {
 
       if (session) {
         setStatus("success");
-        // Redireciona imediatamente após o sucesso
-        navigate("/");
+        // Pequeno delay para o usuário ver a confirmação
+        setTimeout(() => navigate("/"), 1500);
       } else {
-        // Se não houver sessão, pode ser que o link expirou ou já foi usado
         setStatus("error");
       }
     };
@@ -38,21 +37,34 @@ const AuthCallback = () => {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
       <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] bg-white p-8 text-center">
         <CardHeader>
-          <div className="flex justify-center mb-4">
-            {status === "loading" && <Loader2 className="w-16 h-16 text-slate-300 animate-spin" />}
-            {status === "success" && <CheckCircle2 className="w-16 h-16 text-emerald-500 animate-bounce" />}
-            {status === "error" && <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl font-bold">!</div>}
+          <div className="flex justify-center mb-6">
+            {status === "loading" ? (
+              <div className="w-48 h-48 rounded-[2rem] shadow-lg overflow-hidden border-2 border-slate-50 animate-pulse">
+                <img src="/GS.jpeg" alt="Gerlem Software" className="w-full h-full object-cover" />
+              </div>
+            ) : status === "success" ? (
+              <div className="relative">
+                <div className="w-48 h-48 rounded-[2rem] shadow-lg overflow-hidden border-2 border-slate-50 opacity-50">
+                  <img src="/GS.jpeg" alt="Gerlem Software" className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CheckCircle2 className="w-20 h-20 text-emerald-500 drop-shadow-lg animate-bounce" />
+                </div>
+              </div>
+            ) : (
+              <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl font-bold">!</div>
+            )}
           </div>
           <CardTitle className="text-2xl font-black text-slate-800">
             {status === "loading" && "Confirmando seu acesso..."}
-            {status === "success" && "E-mail Confirmado!"}
+            {status === "success" && "Acesso Confirmado!"}
             {status === "error" && "Ops! Algo deu errado"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-slate-500 font-medium">
             {status === "loading" && "Estamos validando sua conta na Jornada Bíblica 2026."}
-            {status === "success" && "Sua conta foi ativada com sucesso. Redirecionando..."}
+            {status === "success" && "Sua conta foi ativada com sucesso. Preparando sua jornada..."}
             {status === "error" && "O link de confirmação pode ter expirado ou já foi utilizado. Tente fazer login novamente."}
           </p>
           
