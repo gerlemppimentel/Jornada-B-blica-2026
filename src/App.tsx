@@ -11,6 +11,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
+/**
+ * "Porque Deus amou o mundo de tal maneira, que deu seu filho unigênito para que todo aquele que nele crê não pereça, mas tenha a vida eterna. João 3.16"
+ */
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
