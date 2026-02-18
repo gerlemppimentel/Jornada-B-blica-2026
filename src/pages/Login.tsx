@@ -46,7 +46,7 @@ const CONGREGATIONS = [
   "Vila Lalau"
   "Vila Rau",
   "Vila Schimidt",
-  "Outra Cidade",
+  "Outras",
 ];
 
 const Login = () => {
