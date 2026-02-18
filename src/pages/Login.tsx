@@ -43,7 +43,7 @@ const CONGREGATIONS = [
   "Três Rios do Norte",
   "Três Rios do Sul",
   "Vieira",
-  "Vila Lalau"
+  "Vila Lalau",
   "Vila Rau",
   "Vila Schimidt",
   "Outras",
