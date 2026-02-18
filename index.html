@@ -25,10 +25,32 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('PWA: ServiceWorker ativo');
+          let refreshing = false;
+
+          // Detect when a new service worker takes control and reload
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              refreshing = true;
+              console.log('PWA: Nova versão detectada, recarregando...');
+              window.location.reload();
+            }
+          });
+
+          navigator.serviceWorker.register('/service-worker.js').then(reg => {
+            console.log('PWA: ServiceWorker registrado');
+
+            // Check for updates on page load
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('PWA: Novo conteúdo disponível, atualizando...');
+                  // The skipWaiting() in the SW will trigger controllerchange
+                }
+              });
+            });
           }).catch(err => {
-            console.log('PWA: Erro no SW', err);
+            console.log('PWA: Erro no registro do SW', err);
           });
         });
       }
