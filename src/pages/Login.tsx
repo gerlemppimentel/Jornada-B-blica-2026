@@ -20,6 +20,7 @@ import {
 const CONGREGATIONS = [
   "Amizade",
   "Barra do Rio Cerro",
+  "Barra do Rio Cerro II",
   "Chocoleite",
   "Ebenezer",
   "Estrada Nova",
@@ -28,22 +29,24 @@ const CONGREGATIONS = [
   "Jaraguá 84",
   "Jaraguazinho",
   "João Pessoa",
+  "Loteamento Souza",
   "Monte Sião",
   "Monte Sinai",
   "Nereu Ramos",
   "Nova Jerusalém",
-  "Rau",
+  "Pedra Branca",
   "Rio da Luz",
   "Rio Molha",
   "São Luiz",
-  "Schimidt",
   "Sede",
   "Shalon",
-  "Souza",
   "Três Rios do Norte",
   "Três Rios do Sul",
   "Vieira",
   "Vila Lalau"
+  "Vila Rau",
+  "Vila Schimidt",
+  "Outra Cidade",
 ];
 
 const Login = () => {
