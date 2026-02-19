@@ -131,7 +131,7 @@ const Navbar = () => {
                         href="mailto:gerlem.dev@outlook.com" 
                         className="text-blue-600 hover:text-blue-800 text-sm transition-colors hover:underline"
                       >
-                        gerlem.dev@outlook.com
+                        suporte@gerlem.dev.br
                       </a>
                     </div>
                   </div>
