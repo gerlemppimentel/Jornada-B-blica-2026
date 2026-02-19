@@ -2,8 +2,9 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Info, Globe, ExternalLink } from "lucide-react";
+import { LogOut, BookOpen, Info, Globe, ExternalLink, Trophy, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,10 +17,25 @@ import {
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [topCongregations, setTopCongregations] = useState<{ congregation: string; reader_count: number }[]>([]);
+  const [loadingTop, setLoadingTop] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
+  };
+
+  const fetchTopCongregations = async () => {
+    setLoadingTop(true);
+    try {
+      const { data, error } = await supabase.rpc('get_top_congregations');
+      if (error) throw error;
+      setTopCongregations(data || []);
+    } catch (error) {
+      console.error("Erro ao buscar top congregações:", error);
+    } finally {
+      setLoadingTop(false);
+    }
   };
 
   const partnerSites = [
@@ -43,6 +59,65 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center gap-1 sm:gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+                  onClick={fetchTopCongregations}
+                >
+                  <Trophy className="w-4 h-4 text-amber-500" />
+                  <span className="hidden sm:inline">Ranking</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[90vw] max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold text-slate-800">Top 5 Congregações</DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <p className="text-xs text-slate-500 mb-4 font-medium">
+                    Congregações com mais leitores ativos nos últimos 7 dias.
+                  </p>
+                  
+                  {loadingTop ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+                    </div>
+                  ) : topCongregations.length > 0 ? (
+                    <div className="space-y-2">
+                      {topCongregations.map((item, index) => (
+                        <div
+                          key={item.congregation}
+                          className="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 border border-slate-100"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-slate-800 truncate">{item.congregation}</p>
+                            <p className="text-xs text-slate-500">{item.reader_count} {item.reader_count === 1 ? 'leitor ativo' : 'leitores ativos'}</p>
+                          </div>
+                          {index === 0 && <Trophy className="w-5 h-5 text-amber-500" />}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-slate-400">
+                      Nenhuma atividade registrada nos últimos 7 dias.
+                    </div>
+                  )}
+                </div>
+                <DialogFooter className="sm:justify-start">
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary" className="rounded-xl w-full sm:w-auto">
+                      Voltar
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4">
