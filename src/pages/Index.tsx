@@ -141,13 +141,6 @@ const Index = () => {
                   );
                 })}
               </div>
-              <div className="mt-4 pt-4 border-t border-slate-50">
-                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  <span>Progresso Geral</span>
-                  <span>{progressPercentage}%</span>
-                </div>
-                <Progress value={progressPercentage} className="h-1.5 bg-slate-100" />
-              </div>
             </CardContent>
           </Card>
           
