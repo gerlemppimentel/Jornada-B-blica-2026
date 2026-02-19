@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Trophy, LayoutGrid } from "lucide-react";
+import { CheckCircle2, Trophy, LayoutGrid, Gem } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import WeeklyProgress from "@/components/WeeklyProgress";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const [completedCount, setCompletedCount] = useState(0);
@@ -15,7 +16,18 @@ const Index = () => {
   const totalWeeks = 47;
   const progressPercentage = Math.round((completedCount / totalWeeks) * 100);
 
-  // Definindo as fases da jornada
+  // Definindo os 7 grupos de conquistas
+  const achievementGroups = [
+    { id: "pentateuco", title: "Pentateuco", end: 10, color: "#E57373", gemName: "Jaspe" },
+    { id: "historicos", title: "Históricos", end: 20, color: "#FFB74D", gemName: "Sardônica" },
+    { id: "poeticos", title: "Poéticos", end: 26, color: "#D32F2F", gemName: "Sárdio" },
+    { id: "profetas", title: "Profetas", end: 35, color: "#9575CD", gemName: "Ametista" },
+    { id: "evangelhos_atos", title: "Evangelhos e Atos", end: 40, color: "#FF8A65", gemName: "Jacinto" },
+    { id: "epistolas", title: "Epístolas", end: 46, color: "#4DB6AC", gemName: "Berilo" },
+    { id: "apocalipse", title: "Apocalipse", end: 47, color: "#64B5F6", gemName: "Safira" },
+  ];
+
+  // Definindo as fases da jornada para o texto informativo
   const journeyPhases = [
     { start: 1, end: 10, title: "Pentateuco", description: "Falta XX semanas para conclusão do Pentateuco" },
     { start: 11, end: 20, title: "Livros Históricos", description: "Falta XX semanas para conclusão dos Livros Históricos" },
@@ -91,14 +103,51 @@ const Index = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
+          <Card className="border-none shadow-sm bg-white rounded-2xl md:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Progresso Anual</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-500">Suas Conquistas</CardTitle>
               <Trophy className="w-4 h-4 text-amber-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-800">{progressPercentage}%</div>
-              <Progress value={progressPercentage} className="h-2 mt-2 bg-slate-100" />
+              <div className="flex flex-wrap gap-3 justify-center py-2">
+                {achievementGroups.map((group) => {
+                  const isCompleted = completedCount >= group.end;
+                  return (
+                    <div
+                      key={group.id}
+                      className="flex flex-col items-center gap-1 group relative"
+                      title={group.title}
+                    >
+                      <div
+                        className={cn(
+                          "p-2 rounded-xl transition-all duration-500",
+                          isCompleted
+                            ? "bg-slate-50 shadow-sm scale-110"
+                            : "bg-slate-50/50 grayscale opacity-30"
+                        )}
+                      >
+                        <Gem
+                          className="w-6 h-6"
+                          style={{ color: isCompleted ? group.color : "#94a3b8" }}
+                        />
+                      </div>
+                      <span className={cn(
+                        "text-[10px] font-bold uppercase tracking-tighter transition-colors",
+                        isCompleted ? "text-slate-700" : "text-slate-300"
+                      )}>
+                        {group.gemName}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 pt-4 border-t border-slate-50">
+                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase mb-1">
+                  <span>Progresso Geral</span>
+                  <span>{progressPercentage}%</span>
+                </div>
+                <Progress value={progressPercentage} className="h-1.5 bg-slate-100" />
+              </div>
             </CardContent>
           </Card>
           
@@ -118,7 +167,7 @@ const Index = () => {
               <CardTitle className="text-sm font-medium text-slate-500">{currentPhase.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-semibold text-slate-800">{currentPhase.description}</div>
+              <div className="text-lg font-semibold text-slate-800 leading-tight">{currentPhase.description}</div>
               <p className="text-xs text-slate-400 mt-2">Continue sua jornada!</p>
             </CardContent>
           </Card>
