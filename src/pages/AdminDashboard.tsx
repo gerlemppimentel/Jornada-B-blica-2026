@@ -14,8 +14,7 @@ import {
   Loader2,
   LogOut,
   BarChart3,
-  UserCheck,
-  Clock
+  UserCheck
 } from "lucide-react";
 import { 
   Select, 
@@ -24,116 +23,57 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-interface UserReading {
-  user_id: string;
-  first_name: string;
-  congregation_name: string;
-  last_reading_date: string | null;
-  weekly_progress: number;
-  total_weeks: number;
-}
-
-interface CongregationRanking {
-  congregation_name: string;
-  reader_count: number;
-  total_progress: number;
-}
+import {
+  fetchTotalReaders,
+  fetchWeeklyActiveUsers,
+  fetchUserReadingStats,
+  fetchCongregationStats,
+  type UserReadingStats,
+  type CongregationStats
+} from "@/utils/admin-queries";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [readers, setReaders] = useState<UserReading[]>([]);
-  const [ranking, setRanking] = useState<CongregationRanking[]>([]);
   const [totalReaders, setTotalReaders] = useState(0);
   const [weeklyActive, setWeeklyActive] = useState(0);
+  const [users, setUsers] = useState<UserReadingStats[]>([]);
+  const [congregationStats, setCongregationStats] = useState<CongregationStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterCongregation, setFilterCongregation] = useState<string>("all");
-  const [congregations, setCongregations] = useState<{ id: string; name: string }[]>([]);
-  const [statsLoading, setStatsLoading] = useState(true);
 
-  // Carregar dados iniciais
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Carregar estatísticas
-        setStatsLoading(true);
-        
-        // Total de leitores
-        const { count: totalReadersCount } = await supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true });
-        
-        setTotalReaders(totalReadersCount || 0);
-
-        // Leitores ativos nos últimos 7 dias
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        
-        const { count: weeklyActiveCount } = await supabase
-          .from("readings")
-          .select("user_id", { count: "exact", head: true })
-          .gte("completed_at", sevenDaysAgo.toISOString());
-        
-        setWeeklyActive(weeklyActiveCount || 0);
-
-        // Ranking de congregações (simulado por enquanto)
-        setRanking([
-          { congregation_name: "Sede", reader_count: 15, total_progress: 450 },
-          { congregation_name: "Jaraguazinho", reader_count: 12, total_progress: 380 },
-          { congregation_name: "Vila Rau", reader_count: 10, total_progress: 320 },
-          { congregation_name: "Rio da Luz", reader_count: 8, total_progress: 250 },
-          { congregation_name: "Nereu Ramos", reader_count: 6, total_progress: 180 }
-        ]);
-
-        // Carregar congregações
-        const { data: congregationData } = await supabase
-          .from("congregations")
-          .select("id, name")
-          .order("name");
-        
-        setCongregations(congregationData || []);
-
-        // Carregar dados dos leitores (simulado por enquanto)
-        setReaders([
-          { 
-            user_id: "1", 
-            first_name: "João Silva", 
-            congregation_name: "Sede", 
-            last_reading_date: new Date().toISOString(), 
-            weekly_progress: 25, 
-            total_weeks: 47 
-          },
-          { 
-            user_id: "2", 
-            first_name: "Maria Santos", 
-            congregation_name: "Jaraguazinho", 
-            last_reading_date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), 
-            weekly_progress: 32, 
-            total_weeks: 47 
-          },
-          { 
-            user_id: "3", 
-            first_name: "Pedro Oliveira", 
-            congregation_name: "Vila Rau", 
-            last_reading_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), 
-            weekly_progress: 18, 
-            total_weeks: 47 
-          }
-        ]);
-
-        setStatsLoading(false);
-        setLoading(false);
-      } catch (error: any) {
-        toast.error("Erro ao carregar dados: " + error.message);
-        setStatsLoading(false);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    loadDashboardData();
   }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Carregar dados em paralelo para melhor performance
+      const [
+        totalReadersCount,
+        weeklyActiveCount,
+        userStats,
+        congStats
+      ] = await Promise.all([
+        fetchTotalReaders(),
+        fetchWeeklyActiveUsers(),
+        fetchUserReadingStats(),
+        fetchCongregationStats()
+      ]);
+
+      setTotalReaders(totalReadersCount);
+      setWeeklyActive(weeklyActiveCount);
+      setUsers(userStats);
+      setCongregationStats(congStats);
+    } catch (error: any) {
+      toast.error("Erro ao carregar dados: " + error.message);
+      console.error("Erro ao carregar dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -144,13 +84,14 @@ const AdminDashboard = () => {
     }
   };
 
-  const filteredReaders = filterCongregation === "all" 
-    ? readers 
-    : readers.filter(reader => reader.congregation_name === filterCongregation);
+  const filteredUsers = filterCongregation === "all" 
+    ? users 
+    : users.filter(user => user.congregation === filterCongregation);
+
+  const congregations = Array.from(new Set(users.map(u => u.congregation))).sort();
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -164,22 +105,19 @@ const AdminDashboard = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleLogout}
-                className="text-slate-600 hover:text-red-600 border-slate-200 hover:border-red-200"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleLogout}
+              className="text-slate-600 hover:text-red-600 border-slate-200 hover:border-red-200"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -187,7 +125,7 @@ const AdminDashboard = () => {
               <Users className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              {statsLoading ? (
+              {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               ) : (
                 <>
@@ -204,7 +142,7 @@ const AdminDashboard = () => {
               <UserCheck className="w-4 h-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              {statsLoading ? (
+              {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               ) : (
                 <>
@@ -221,12 +159,14 @@ const AdminDashboard = () => {
               <BookOpen className="w-4 h-4 text-amber-500" />
             </CardHeader>
             <CardContent>
-              {statsLoading ? (
+              {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               ) : (
                 <>
                   <div className="text-2xl font-bold text-slate-800">
-                    {totalReaders > 0 ? Math.round((readers.reduce((sum, r) => sum + r.weekly_progress, 0) / totalReaders)) : 0}%
+                    {totalReaders > 0 
+                      ? Math.round((users.reduce((sum, u) => sum + ((u.completed_weeks / 47) * 100), 0) / totalReaders)) 
+                      : 0}%
                   </div>
                   <p className="text-xs text-slate-400 mt-1">Média de conclusão</p>
                 </>
@@ -244,28 +184,28 @@ const AdminDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {statsLoading ? (
+            {loading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
               </div>
-            ) : ranking.length > 0 ? (
+            ) : congregationStats.length > 0 ? (
               <div className="space-y-3">
-                {ranking.map((item, index) => (
+                {congregationStats.map((item, index) => (
                   <div 
-                    key={item.congregation_name} 
+                    key={item.congregation} 
                     className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100"
                   >
                     <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">
                       {index + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-slate-800 truncate">{item.congregation_name}</p>
+                      <p className="font-bold text-slate-800 truncate">{item.congregation}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-sm text-slate-600">{item.reader_count} leitores</span>
                         <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-blue-500 rounded-full"
-                            style={{ width: `${Math.min(100, (item.total_progress / (item.reader_count * 47)) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (item.total_readings / (item.reader_count * 47)) * 100)}%` }}
                           />
                         </div>
                       </div>
@@ -298,8 +238,8 @@ const AdminDashboard = () => {
                 <SelectContent className="rounded-xl">
                   <SelectItem value="all">Todas as Congregações</SelectItem>
                   {congregations.map((cong) => (
-                    <SelectItem key={cong.id} value={cong.name}>
-                      {cong.name}
+                    <SelectItem key={cong} value={cong}>
+                      {cong}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -311,7 +251,7 @@ const AdminDashboard = () => {
               <div className="flex justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
               </div>
-            ) : filteredReaders.length > 0 ? (
+            ) : filteredUsers.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -323,24 +263,25 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredReaders.map((reader) => (
-                      <tr key={reader.user_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                    {filteredUsers.map((user) => (
+                      <tr key={user.user_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                         <td className="py-4 px-4">
-                          <div className="font-medium text-slate-800">{reader.first_name}</div>
+                          <div className="font-medium text-slate-800">{user.first_name}</div>
+                          <div className="text-xs text-slate-400">{user.email}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-slate-600">{reader.congregation_name}</div>
+                          <div className="text-slate-600">{user.congregation}</div>
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                               <div 
                                 className="h-full bg-blue-500 rounded-full"
-                                style={{ width: `${(reader.weekly_progress / 47) * 100}%` }}
+                                style={{ width: `${(user.completed_weeks / 47) * 100}%` }}
                               />
                             </div>
                             <span className="text-sm text-slate-600 min-w-[40px]">
-                              {reader.weekly_progress}/47
+                              {user.completed_weeks}/47
                             </span>
                           </div>
                         </td>
@@ -348,8 +289,8 @@ const AdminDashboard = () => {
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-slate-400" />
                             <span className="text-slate-600 text-sm">
-                              {reader.last_reading_date 
-                                ? new Date(reader.last_reading_date).toLocaleDateString('pt-BR') 
+                              {user.last_reading_date 
+                                ? new Date(user.last_reading_date).toLocaleDateString('pt-BR') 
                                 : 'Nenhuma leitura'}
                             </span>
                           </div>
