@@ -5,18 +5,19 @@ import { Button } from "@/components/ui/button";
 import { LogOut, BookOpen, Info, Globe, ExternalLink, Trophy, Loader2, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [topCongregations, setTopCongregations] = useState<{ congregation: string; reader_count: number }[]>([]);
   const [loadingTop, setLoadingTop] = useState(false);
 
@@ -59,32 +60,87 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center gap-1 sm:gap-2">
+            {/* Botões para usuários normais */}
+            {!isAdmin && (
+              <>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+                    >
+                      <Info className="w-4 h-4" />
+                      <span className="hidden sm:inline">Sobre</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Sobre a Jornada Bíblica</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <p>Informações sobre a jornada...</p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+                    >
+                      <Globe className="w-4 h-4" />
+                      <span className="hidden sm:inline">Links Úteis</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Links Úteis</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {partnerSites.map((site) => (
+                        <a
+                          key={site.name}
+                          href={site.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg"
+                        >
+                          <span>{site.name}</span>
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+
+            {/* Botão do Dashboard apenas para admins */}
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/admin")}
+                className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span className="hidden sm:inline">Painel Admin</span>
+              </Button>
+            )}
+
+            {/* Botão de Logout para todos */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/admin")}
-              className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+              onClick={handleLogout}
+              className="text-slate-600 hover:text-red-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
             >
-              <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Painel Admin</span>
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sair</span>
             </Button>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
-                  onClick={fetchTopCongregations}
-                >
-                  <Trophy className="w-4 h-4 text-amber-500" />
-                  <span className="hidden sm:inline">Ranking</span>
-                </Button>
-              </DialogTrigger>
-              {/* Rest of the Dialog content remains the same */}
-            </Dialog>
-
-            {/* Rest of the buttons remain the same */}
           </div>
         </div>
       </div>
