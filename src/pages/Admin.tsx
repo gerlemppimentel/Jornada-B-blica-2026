@@ -38,9 +38,9 @@ const AdminDashboard = () => {
 
       const { data: activeUsers, error: activeError } = await supabase
         .from('readings')
-        .select('user_id, book_name, created_at') // Mudamos para created_at
+        .select('user_id, book_name, completed_at') // Voltamos para completed_at
         .ilike('book_name', 'Semana%')
-        .gte('created_at', sevenDaysAgo.toISOString()); // Mudamos para created_at
+        .gte('completed_at', sevenDaysAgo.toISOString()); // Voltamos para completed_at
 
       if (activeError) throw activeError;
 
