@@ -38,9 +38,9 @@ const AdminDashboard = () => {
 
       const { data: activeUsers, error: activeError } = await supabase
         .from('readings')
-        .select('user_id, book_name, completed_at')
+        .select('user_id, book_name, created_at') // Mudamos para created_at
         .ilike('book_name', 'Semana%')
-        .gte('completed_at', sevenDaysAgo.toISOString());
+        .gte('created_at', sevenDaysAgo.toISOString()); // Mudamos para created_at
 
       if (activeError) throw activeError;
 
@@ -52,7 +52,8 @@ const AdminDashboard = () => {
         totalUsers: total,
         activeUsersData: activeUsers,
         uniqueActiveUsers,
-        sevenDaysAgo: sevenDaysAgo.toISOString()
+        sevenDaysAgo: sevenDaysAgo.toISOString(),
+        queryTime: new Date().toISOString()
       });
 
       setActivityData({
@@ -71,6 +72,10 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchActivityData();
+
+    // Atualizar dados a cada 5 minutos
+    const interval = setInterval(fetchActivityData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = async () => {
@@ -97,14 +102,25 @@ const AdminDashboard = () => {
               </div>
             </div>
             
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleLogout}
-              className="text-slate-600 hover:text-red-600"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={fetchActivityData}
+                className="text-slate-600"
+              >
+                Atualizar
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleLogout}
+                className="text-slate-600 hover:text-red-600"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
