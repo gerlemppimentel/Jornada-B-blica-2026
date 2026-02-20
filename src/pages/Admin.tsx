@@ -19,38 +19,40 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activityData, setActivityData] = useState<UserActivityData | null>(null);
 
-  // Função simples para buscar dados de atividade
   const fetchActivityData = async () => {
     try {
       console.log("Iniciando busca de dados de atividade...");
       setLoading(true);
 
-      // 1. Primeiro, buscar total de usuários
+      // 1. Buscar total de usuários
       const { count: totalUsers, error: countError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
       if (countError) throw countError;
+      console.log("Total de usuários:", totalUsers);
 
-      // 2. Depois, buscar usuários ativos nos últimos 7 dias
+      // 2. Buscar usuários que marcaram semanas nos últimos 7 dias
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       const { data: activeUsers, error: activeError } = await supabase
         .from('readings')
-        .select('user_id')
+        .select('user_id, book_name, completed_at')
+        .ilike('book_name', 'Semana%')
         .gte('completed_at', sevenDaysAgo.toISOString());
 
       if (activeError) throw activeError;
 
-      // 3. Calcular métricas
+      // Contar usuários únicos que marcaram semanas
       const uniqueActiveUsers = new Set(activeUsers?.map(u => u.user_id) || []).size;
       const total = totalUsers || 0;
       
-      console.log("Dados coletados:", {
-        total,
-        active: uniqueActiveUsers,
-        inactive: total - uniqueActiveUsers
+      console.log("Dados de atividade:", {
+        totalUsers: total,
+        activeUsersData: activeUsers,
+        uniqueActiveUsers,
+        sevenDaysAgo: sevenDaysAgo.toISOString()
       });
 
       setActivityData({
@@ -82,7 +84,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -90,9 +91,10 @@ const AdminDashboard = () => {
               <div className="bg-slate-800 p-2 rounded-lg">
                 <PieChart className="text-white w-5 h-5" />
               </div>
-              <h1 className="text-lg font-bold text-slate-800">
-                Dashboard Administrativo
-              </h1>
+              <div>
+                <h1 className="text-lg font-bold text-slate-800">Dashboard Administrativo</h1>
+                <p className="text-xs text-slate-500">Atividade nos últimos 7 dias</p>
+              </div>
             </div>
             
             <Button 
@@ -107,11 +109,15 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="border-none shadow-sm bg-white rounded-2xl">
           <CardHeader>
-            <CardTitle>Atividade dos Usuários (Últimos 7 dias)</CardTitle>
+            <CardTitle className="flex flex-col gap-1">
+              <span>Leitores Ativos vs. Inativos</span>
+              <span className="text-sm font-normal text-slate-500">
+                Baseado em marcações de leitura nos últimos 7 dias
+              </span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center">
             {loading ? (
@@ -120,7 +126,6 @@ const AdminDashboard = () => {
               </div>
             ) : activityData ? (
               <div className="space-y-6">
-                {/* Gráfico Simplificado */}
                 <div className="flex gap-4 justify-center">
                   <div className="text-center">
                     <div className="w-32 h-32 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-xl">
@@ -136,10 +141,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                {/* Métricas */}
                 <div className="text-center space-y-1">
                   <p className="text-sm text-slate-500">
-                    Total de Usuários: <span className="font-bold text-slate-700">{activityData.total}</span>
+                    Total de Leitores: <span className="font-bold text-slate-700">{activityData.total}</span>
                   </p>
                   <p className="text-sm text-slate-500">
                     Taxa de Atividade: <span className="font-bold text-slate-700">
