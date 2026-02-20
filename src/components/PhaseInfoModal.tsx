@@ -30,7 +30,7 @@ const PhaseInfoModal = ({ isOpen, onClose, title, description, color }: PhaseInf
             <div className="space-y-1">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-50">Nova Fase</p>
               <DialogTitle className="text-2xl font-black text-slate-800 leading-tight">
-                Conheça o {title}
+                Conheça: {title}
               </DialogTitle>
             </div>
           </div>
