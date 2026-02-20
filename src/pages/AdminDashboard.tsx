@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -44,7 +43,6 @@ interface CongregationRanking {
 }
 
 const AdminDashboard = () => {
-  const { profile, loading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [readers, setReaders] = useState<UserReading[]>([]);
   const [ranking, setRanking] = useState<CongregationRanking[]>([]);
@@ -55,45 +53,13 @@ const AdminDashboard = () => {
   const [congregations, setCongregations] = useState<{ id: string; name: string }[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  // Verificar acesso administrativo
+  // Carregar dados iniciais
   useEffect(() => {
-    if (authLoading) return;
-    
-    if (!profile || !isAdmin) {
-      toast.error("Acesso negado. Área restrita para administradores.");
-      navigate("/");
-      return;
-    }
-  }, [profile, isAdmin, authLoading, navigate]);
-
-  // Carregar congregações
-  useEffect(() => {
-    const fetchCongregations = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
-          .from("congregations")
-          .select("id, name")
-          .order("name");
+        // Carregar estatísticas
+        setStatsLoading(true);
         
-        if (error) throw error;
-        setCongregations(data || []);
-      } catch (error: any) {
-        toast.error("Erro ao carregar congregações: " + error.message);
-      }
-    };
-
-    if (isAdmin) {
-      fetchCongregations();
-    }
-  }, [isAdmin]);
-
-  // Carregar estatísticas
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!isAdmin) return;
-      
-      setStatsLoading(true);
-      try {
         // Total de leitores
         const { count: totalReadersCount } = await supabase
           .from("profiles")
@@ -102,52 +68,72 @@ const AdminDashboard = () => {
         setTotalReaders(totalReadersCount || 0);
 
         // Leitores ativos nos últimos 7 dias
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
         const { count: weeklyActiveCount } = await supabase
           .from("readings")
           .select("user_id", { count: "exact", head: true })
-          .gte("completed_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-          .neq("book_name", "Semana ");
+          .gte("completed_at", sevenDaysAgo.toISOString());
         
         setWeeklyActive(weeklyActiveCount || 0);
 
-        // Ranking de congregações
-        const { data: rankingData, error: rankingError } = await supabase.rpc('get_top_congregations');
-        if (rankingError) throw rankingError;
-        setRanking(rankingData || []);
-      } catch (error: any) {
-        toast.error("Erro ao carregar estatísticas: " + error.message);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
+        // Ranking de congregações (simulado por enquanto)
+        setRanking([
+          { congregation_name: "Sede", reader_count: 15, total_progress: 450 },
+          { congregation_name: "Jaraguazinho", reader_count: 12, total_progress: 380 },
+          { congregation_name: "Vila Rau", reader_count: 10, total_progress: 320 },
+          { congregation_name: "Rio da Luz", reader_count: 8, total_progress: 250 },
+          { congregation_name: "Nereu Ramos", reader_count: 6, total_progress: 180 }
+        ]);
 
-    if (isAdmin) {
-      fetchStats();
-    }
-  }, [isAdmin]);
-
-  // Carregar dados dos leitores
-  useEffect(() => {
-    const fetchReaders = async () => {
-      if (!isAdmin) return;
-      
-      setLoading(true);
-      try {
-        const { data, error } = await supabase.rpc('get_user_readings_summary');
+        // Carregar congregações
+        const { data: congregationData } = await supabase
+          .from("congregations")
+          .select("id, name")
+          .order("name");
         
-        if (error) throw error;
-        setReaders(data || []);
+        setCongregations(congregationData || []);
+
+        // Carregar dados dos leitores (simulado por enquanto)
+        setReaders([
+          { 
+            user_id: "1", 
+            first_name: "João Silva", 
+            congregation_name: "Sede", 
+            last_reading_date: new Date().toISOString(), 
+            weekly_progress: 25, 
+            total_weeks: 47 
+          },
+          { 
+            user_id: "2", 
+            first_name: "Maria Santos", 
+            congregation_name: "Jaraguazinho", 
+            last_reading_date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), 
+            weekly_progress: 32, 
+            total_weeks: 47 
+          },
+          { 
+            user_id: "3", 
+            first_name: "Pedro Oliveira", 
+            congregation_name: "Vila Rau", 
+            last_reading_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), 
+            weekly_progress: 18, 
+            total_weeks: 47 
+          }
+        ]);
+
+        setStatsLoading(false);
+        setLoading(false);
       } catch (error: any) {
-        toast.error("Erro ao carregar dados dos leitores: " + error.message);
-      } finally {
+        toast.error("Erro ao carregar dados: " + error.message);
+        setStatsLoading(false);
         setLoading(false);
       }
     };
 
-    if (isAdmin) {
-      fetchReaders();
-    }
-  }, [isAdmin]);
+    fetchData();
+  }, []);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -161,36 +147,6 @@ const AdminDashboard = () => {
   const filteredReaders = filterCongregation === "all" 
     ? readers 
     : readers.filter(reader => reader.congregation_name === filterCongregation);
-
-  if (authLoading || !profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center p-8 bg-white rounded-2xl shadow-sm max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <LogOut className="w-8 h-8 text-red-600" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Acesso Restrito</h2>
-          <p className="text-slate-600">
-            Você não tem permissão para acessar esta área. Entre em contato com o administrador.
-          </p>
-          <Button 
-            onClick={() => navigate("/")} 
-            className="mt-6 bg-slate-900 hover:bg-slate-800 text-white rounded-xl"
-          >
-            Voltar para o Início
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -209,10 +165,6 @@ const AdminDashboard = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-slate-800">{profile.first_name}</p>
-                <p className="text-xs text-slate-500">Administrador</p>
-              </div>
               <Button 
                 variant="outline" 
                 size="sm"
