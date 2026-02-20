@@ -32,9 +32,11 @@ import {
   type UserReadingStats,
   type CongregationStats
 } from "@/utils/admin-queries";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { checkAdminAccess, loading: authLoading } = useAuth();
   const [totalReaders, setTotalReaders] = useState(0);
   const [weeklyActive, setWeeklyActive] = useState(0);
   const [users, setUsers] = useState<UserReadingStats[]>([]);
@@ -43,8 +45,12 @@ const AdminDashboard = () => {
   const [filterCongregation, setFilterCongregation] = useState<string>("all");
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    if (!authLoading) {
+      if (checkAdminAccess()) {
+        loadDashboardData();
+      }
+    }
+  }, [authLoading]);
 
   const loadDashboardData = async () => {
     try {
@@ -89,6 +95,14 @@ const AdminDashboard = () => {
     : users.filter(user => user.congregation === filterCongregation);
 
   const congregations = Array.from(new Set(users.map(u => u.congregation))).sort();
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
