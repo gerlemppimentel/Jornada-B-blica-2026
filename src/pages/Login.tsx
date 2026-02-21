@@ -106,7 +106,7 @@ const Login = () => {
         setNeedsConfirmation(true);
         setIsSignUp(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -121,9 +121,30 @@ const Login = () => {
           }
           throw error;
         }
+
+        // Busca a role do usuário no perfil
+        if (authData.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_role')
+            .eq('id', authData.user.id)
+            .single();
+
+          if (!profileError && profile) {
+            if (profile.user_role === 'leitor') {
+              navigate("/");
+            } else if (profile.user_role === 'admin') {
+              navigate("/admin");
+            } else {
+              navigate("/");
+            }
+          } else {
+            // Fallback caso ocorra erro na busca do perfil
+            navigate("/");
+          }
+        }
         
         toast.success("Login realizado!");
-        navigate("/");
       }
     } catch (error: any) {
       toast.error(error.message);
