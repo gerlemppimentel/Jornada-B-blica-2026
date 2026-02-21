@@ -36,30 +36,33 @@ const AdminDashboard = () => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const { data: activeUsers, error: activeError } = await supabase
+      // Buscamos todas as leituras de semanas nos últimos 7 dias
+      const { data: activeReadings, error: activeError } = await supabase
         .from('readings')
-        .select('user_id, book_name, completed_at') // Voltamos para completed_at
+        .select('user_id')
         .ilike('book_name', 'Semana%')
-        .gte('completed_at', sevenDaysAgo.toISOString()); // Voltamos para completed_at
+        .gte('completed_at', sevenDaysAgo.toISOString());
 
       if (activeError) throw activeError;
 
       // Contar usuários únicos que marcaram semanas
-      const uniqueActiveUsers = new Set(activeUsers?.map(u => u.user_id) || []).size;
+      const uniqueActiveUserIds = new Set(activeReadings?.map(u => u.user_id) || []);
+      const activeCount = uniqueActiveUserIds.size;
       const total = totalUsers || 0;
+      const inactiveCount = total - activeCount;
       
       console.log("Dados de atividade:", {
         totalUsers: total,
-        activeUsersData: activeUsers,
-        uniqueActiveUsers,
+        activeCount,
+        inactiveCount,
         sevenDaysAgo: sevenDaysAgo.toISOString(),
         queryTime: new Date().toISOString()
       });
 
       setActivityData({
         total,
-        active: uniqueActiveUsers,
-        inactive: total - uniqueActiveUsers
+        active: activeCount,
+        inactive: inactiveCount
       });
 
     } catch (error: any) {
