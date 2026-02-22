@@ -67,13 +67,25 @@ const Navbar = () => {
                     <div className="mt-4 space-y-4 text-sm text-slate-600">
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Cliente</p>
-                        <p className="font-semibold text-slate-700">Igreja Evangélica Assembleia de Deus em Jaraguá do Sul - Santa Catarina</p>
+                        <a 
+                          href="https://adjaraguadosul.com.br/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+                        >
+                          Igreja Evangélica Assembleia de Deus em Jaraguá do Sul - Santa Catarina
+                        </a>
                       </div>
                       
                       <div className="border-t border-slate-100 pt-4 space-y-1">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Desenvolvedor</p>
                         <p className="font-semibold text-slate-700">Gerlem Pimentel</p>
-                        <p className="text-xs">gerlem.dev@outlook.com</p>
+                        <a 
+                          href="mailto:gerlem.dev@outlook.com"
+                          className="block text-xs hover:text-slate-900 transition-colors"
+                        >
+                          gerlem.dev@outlook.com
+                        </a>
                       </div>
                       
                       <div className="mt-6 pt-4 border-t border-slate-100">
