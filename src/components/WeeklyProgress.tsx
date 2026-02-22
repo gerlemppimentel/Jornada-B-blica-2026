@@ -189,17 +189,23 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
       if (!user) return;
 
       if (isAdding) {
+        // Usar INSERT ao invés de UPSERT para evitar problemas com políticas UPDATE
         const { error } = await supabase
           .from("readings")
-          .upsert(
-            {
-              user_id: user.id,
-              book_name: weekLabel
-            },
-            { onConflict: 'user_id,book_name' }
-          );
+          .insert({
+            user_id: user.id,
+            book_name: weekLabel
+          });
 
-        if (error) throw error;
+        if (error) {
+          // Se for erro de duplicata (já existe o registro), apenas ignoramos
+          if (error.code === '23505') {
+            // Registro já existe, apenas continuamos
+            console.log("Registro já existe, continuando...");
+          } else {
+            throw error;
+          }
+        }
         playToc();
 
         // Verificar se iniciou uma fase
@@ -246,11 +252,8 @@ const WeeklyProgress = ({ onProgressUpdate }: { onProgressUpdate: (count: number
 
       toast.success(`${weekLabel} ${isAdding ? 'concluída!' : 'desmarcada.'}`);
     } catch (error: any) {
-      if (error.code === '23505') {
-        fetchProgress();
-      } else {
-        toast.error("Erro ao salvar: " + error.message);
-      }
+      console.error("Erro ao salvar leitura:", error);
+      toast.error("Erro ao salvar: " + error.message);
     } finally {
       setSyncing(null);
     }
