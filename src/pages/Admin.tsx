@@ -199,13 +199,10 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 
-                <div className="pt-6 border-t border-slate-50">
-                  <Button 
-                    onClick={fetchActivityData}
-                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-12 px-8 font-bold"
-                  >
-                    Atualizar Relatório
-                  </Button>
+                <div className="pt-6 border-t border-slate-50 text-center">
+                  <p className="text-xs text-slate-400 font-medium">
+                    Dados atualizados automaticamente em tempo real
+                  </p>
                 </div>
               </div>
             ) : (
