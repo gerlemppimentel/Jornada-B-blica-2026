@@ -31,7 +31,8 @@ const AdminDashboard = () => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const { data: activeReadings, error: activeError } = await supabase
+      // CORREÇÃO: Buscar usuários únicos que tiveram atividade nos últimos 7 dias
+      const { data: activeUsers, error: activeError } = await supabase
         .from('readings')
         .select('user_id')
         .ilike('book_name', 'Semana%')
@@ -39,7 +40,8 @@ const AdminDashboard = () => {
 
       if (activeError) throw activeError;
 
-      const uniqueActiveUserIds = new Set(activeReadings?.map(u => u.user_id) || []);
+      // CORREÇÃO: Contar usuários únicos (não registros)
+      const uniqueActiveUserIds = new Set(activeUsers?.map(u => u.user_id) || []);
       const activeCount = uniqueActiveUserIds.size;
       const total = totalUsers || 0;
       
@@ -192,7 +194,7 @@ const AdminDashboard = () => {
                       <div className="w-3 h-3 bg-emerald-500 rounded-full" />
                       <span className="text-sm font-bold text-slate-600">Leitores Engajados</span>
                     </div>
-                    <p className="text-slate-400 text-xs">Usuários que registraram progresso na última semana.</p>
+                    <p className="text-slate-400 text-xs">Usuários únicos que registraram progresso na última semana.</p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
