@@ -2,7 +2,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Info, Globe, ExternalLink, LayoutDashboard } from "lucide-react";
+import { LogOut, BookOpen, Info, Globe, ExternalLink, LayoutDashboard, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -71,9 +71,12 @@ const Navbar = () => {
                           href="https://adjaraguadosul.com.br/" 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="block font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+                          className="flex items-center justify-center gap-2 font-bold text-blue-600 hover:text-blue-800 transition-colors group"
                         >
-                          Igreja Evangélica Assembleia de Deus em Jaraguá do Sul - Santa Catarina
+                          <span className="text-center underline underline-offset-4 decoration-blue-200 group-hover:decoration-blue-800">
+                            AD Jaraguá do Sul
+                          </span>
+                          <ExternalLink className="w-3 h-3 shrink-0" />
                         </a>
                       </div>
                       
@@ -82,9 +85,12 @@ const Navbar = () => {
                         <p className="font-semibold text-slate-700">Gerlem Pimentel</p>
                         <a 
                           href="mailto:gerlem.dev@outlook.com"
-                          className="block text-xs hover:text-slate-900 transition-colors"
+                          className="flex items-center justify-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors group"
                         >
-                          gerlem.dev@outlook.com
+                          <Mail className="w-3 h-3 text-slate-400 group-hover:text-slate-900" />
+                          <span className="underline underline-offset-2 decoration-slate-200 group-hover:decoration-slate-900">
+                            gerlem.dev@outlook.com
+                          </span>
                         </a>
                       </div>
                       
