@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import CongregationRankingModal from "./CongregationRankingModal";
 
@@ -117,13 +118,15 @@ const Navbar = () => {
                     </div>
                     
                     <div className="pt-4 border-t border-slate-100">
-                      <Button
-                        variant="ghost"
-                        className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                        Voltar
-                      </Button>
+                      <DialogClose asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
+                        >
+                          <ArrowLeft className="w-4 h-4" />
+                          Voltar
+                        </Button>
+                      </DialogClose>
                     </div>
                   </div>
                 </DialogContent>
@@ -160,13 +163,15 @@ const Navbar = () => {
                   </div>
                   
                   <div className="pt-4 border-t border-slate-100 mt-4">
-                    <Button
-                      variant="ghost"
-                      className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      Voltar
-                    </Button>
+                    <DialogClose asChild>
+                      <Button
+                        variant="ghost"
+                        className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Voltar
+                      </Button>
+                    </DialogClose>
                   </div>
                 </DialogContent>
               </Dialog>
