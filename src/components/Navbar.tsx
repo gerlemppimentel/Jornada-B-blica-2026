@@ -2,7 +2,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Info, Globe, ExternalLink, Trophy, Loader2, LayoutDashboard } from "lucide-react";
+import { LogOut, BookOpen, Info, Globe, ExternalLink, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,31 +12,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const [topCongregations, setTopCongregations] = useState<{ congregation: string; reader_count: number }[]>([]);
-  const [loadingTop, setLoadingTop] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
-  };
-
-  const fetchTopCongregations = async () => {
-    setLoadingTop(true);
-    try {
-      const { data, error } = await supabase.rpc('get_top_congregations');
-      if (error) throw error;
-      setTopCongregations(data || []);
-    } catch (error) {
-      console.error("Erro ao buscar top congregações:", error);
-    } finally {
-      setLoadingTop(false);
-    }
   };
 
   const partnerSites = [
@@ -60,65 +44,81 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center gap-1 sm:gap-2">
-            {/* Botões para usuários normais */}
-            {!isAdmin && (
-              <>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
-                    >
-                      <Info className="w-4 h-4" />
-                      <span className="hidden sm:inline">Sobre</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Sobre a Jornada Bíblica</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <p>Informações sobre a jornada...</p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+                >
+                  <Info className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sobre</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[90vw] max-w-md rounded-[2.5rem] p-8 border-none shadow-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-center text-2xl font-black text-slate-800">
+                    Sobre a Jornada
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h3 className="font-bold text-lg text-slate-800">Jornada Bíblica - Versão 2026</h3>
+                    <div className="mt-4 space-y-4 text-sm text-slate-600">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Cliente</p>
+                        <p className="font-semibold text-slate-700">Igreja Evangélica Assembleia de Deus em Jaraguá do Sul - Santa Catarina</p>
+                      </div>
+                      
+                      <div className="border-t border-slate-100 pt-4 space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Desenvolvedor</p>
+                        <p className="font-semibold text-slate-700">Gerlem Pimentel</p>
+                        <p className="text-xs">gerlem.dev@outlook.com</p>
+                      </div>
+                      
+                      <div className="mt-6 pt-4 border-t border-slate-100">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                          © 2026 Todos os Direitos Reservados
+                        </p>
+                      </div>
                     </div>
-                  </DialogContent>
-                </Dialog>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-600 flex items-center gap-2 hover:bg-slate-50 rounded-xl px-2 sm:px-4"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span className="hidden sm:inline">Links Úteis</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[90vw] max-w-md rounded-[2.5rem] p-6 border-none shadow-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-black text-slate-800">Links Úteis</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 mt-4">
+                  {partnerSites.map((site) => (
+                    <a
+                      key={site.name}
+                      href={site.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors group"
                     >
-                      <Globe className="w-4 h-4" />
-                      <span className="hidden sm:inline">Links Úteis</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Links Úteis</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      {partnerSites.map((site) => (
-                        <a
-                          key={site.name}
-                          href={site.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg"
-                        >
-                          <span>{site.name}</span>
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
+                      <span className="font-semibold text-slate-700 group-hover:text-slate-900">{site.name}</span>
+                      <ExternalLink className="w-4 h-4 text-slate-400" />
+                    </a>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
 
-            {/* Botão do Dashboard apenas para admins */}
             {isAdmin && (
               <Button
                 variant="ghost"
@@ -131,7 +131,6 @@ const Navbar = () => {
               </Button>
             )}
 
-            {/* Botão de Logout para todos */}
             <Button
               variant="ghost"
               size="sm"
