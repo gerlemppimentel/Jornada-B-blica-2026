@@ -97,6 +97,25 @@ const AdminDashboard = () => {
 
   const activityRate = activityData?.total ? Math.round((activityData.active / activityData.total) * 100) : 0;
 
+  // Calcular ângulos para o gráfico de pizza
+  const getPieChartData = () => {
+    if (!activityData) return null;
+    
+    const { active, inactive } = activityData;
+    const total = active + inactive;
+    if (total === 0) return null;
+
+    const activeAngle = (active / total) * 360;
+    const inactiveAngle = (inactive / total) * 360;
+
+    return {
+      active: Math.max(activeAngle, 1), // Mínimo de 1 grau para garantir visibilidade
+      inactive: Math.max(inactiveAngle, 1)
+    };
+  };
+
+  const pieData = getPieChartData();
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
@@ -175,27 +194,79 @@ const AdminDashboard = () => {
               </div>
             ) : activityData ? (
               <div className="space-y-8">
-                <div className="relative h-6 bg-slate-100 rounded-full overflow-hidden flex">
-                  <div 
-                    className="h-full bg-emerald-500 transition-all duration-1000"
-                    style={{ width: `${activityRate}%` }}
-                  />
+                {/* Gráfico de Pizza */}
+                <div className="flex justify-center">
+                  <div className="relative">
+                    {/* Gráfico de pizza SVG */}
+                    <svg width="160" height="160" viewBox="0 0 160 160" className="transform -rotate-90">
+                      {/* Background circle */}
+                      <circle 
+                        cx="80" 
+                        cy="80" 
+                        r="70" 
+                        fill="#f1f5f9"
+                        stroke="#e2e8f0"
+                        strokeWidth="1"
+                      />
+                      
+                      {/* Active readers slice (verde) */}
+                      {pieData && (
+                        <circle 
+                          cx="80" 
+                          cy="80" 
+                          r="70" 
+                          fill="transparent"
+                          stroke="#10b981"
+                          strokeWidth="12"
+                          strokeDasharray={`${pieData.active} ${360 - pieData.active}`}
+                          strokeLinecap="round"
+                        />
+                      )}
+                      
+                      {/* Inactive readers slice (amarelo) - só aparece se houverem dados */}
+                      {pieData && activityData.inactive > 0 && (
+                        <circle 
+                          cx="80" 
+                          cy="80" 
+                          r="70" 
+                          fill="transparent"
+                          stroke="#f59e0b"
+                          strokeWidth="12"
+                          strokeDasharray={`${pieData.inactive} ${360 - pieData.inactive}`}
+                          strokeDashoffset={`-${pieData.active}`}
+                          strokeLinecap="round"
+                        />
+                      )}
+                    </svg>
+                    
+                    {/* Texto centralizado */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-sm font-bold text-slate-500">Total</div>
+                        <div className="text-2xl font-black text-slate-800">
+                          {activityData.total}
+                        </div>
+                        <div className="text-xs text-slate-400">leitores</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
+                {/* Legendas */}
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-emerald-500 rounded-full" />
                       <span className="text-sm font-bold text-slate-600">Leitores Engajados</span>
                     </div>
-                    <p className="text-slate-400 text-xs">Usuários únicos que registraram progresso na última semana.</p>
+                    <div className="text-lg font-bold text-slate-800">{activityData.active}</div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-slate-200 rounded-full" />
+                      <div className="w-3 h-3 bg-amber-500 rounded-full" />
                       <span className="text-sm font-bold text-slate-600">Leitores em Pausa</span>
                     </div>
-                    <p className="text-slate-400 text-xs">Usuários cadastrados que ainda não marcaram leituras recentes.</p>
+                    <div className="text-lg font-bold text-slate-800">{activityData.inactive}</div>
                   </div>
                 </div>
                 
