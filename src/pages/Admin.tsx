@@ -150,137 +150,128 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto w-full px-4 py-8 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <main className="max-w-7xl mx-auto w-full px-4 py-8">
+        {/* Grid 2x2 para os cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Primeira linha: Total de Leitores e Leitores Ativos */}
           <Card className="border-none shadow-sm bg-white rounded-[2.5rem] overflow-hidden">
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-slate-600" />
+            <CardContent className="p-6 flex flex-col items-center text-center">
+              <div className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center mb-3">
+                <Users className="w-5 h-5 text-slate-600" />
               </div>
               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Total de Leitores</p>
-              <p className="text-4xl font-black text-slate-800 mt-1">{activityData?.total || 0}</p>
+              <p className="text-3xl font-black text-slate-800 mt-1">{activityData?.total || 0}</p>
             </CardContent>
           </Card>
 
           <Card className="border-none shadow-sm bg-emerald-500 text-white rounded-[2.5rem] overflow-hidden">
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-white" />
+            <CardContent className="p-6 flex flex-col items-center text-center">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center mb-3">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <p className="text-sm font-bold text-emerald-100 uppercase tracking-widest">Ativos (7 dias)</p>
-              <p className="text-4xl font-black text-white mt-1">{activityData?.active || 0}</p>
+              <p className="text-3xl font-black text-white mt-1">{activityData?.active || 0}</p>
+            </CardContent>
+          </Card>
+
+          {/* Segunda linha: Engajamento e Visualização de Atividade */}
+          <Card className="border-none shadow-sm bg-white rounded-[2.5rem] overflow-hidden">
+            <CardContent className="p-6 flex flex-col items-center text-center">
+              <div className="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center mb-3">
+                <PieChart className="w-5 h-5 text-amber-600" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Engajamento</p>
+              <p className="text-3xl font-black text-slate-800 mt-1">{activityRate}%</p>
             </CardContent>
           </Card>
 
           <Card className="border-none shadow-sm bg-white rounded-[2.5rem] overflow-hidden">
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center mb-4">
-                <PieChart className="w-6 h-6 text-amber-600" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Engajamento</p>
-              <p className="text-4xl font-black text-slate-800 mt-1">{activityRate}%</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="border-none shadow-sm bg-white rounded-[2.5rem] overflow-hidden">
-          <CardHeader className="p-8 pb-0">
-            <CardTitle className="text-xl font-black text-slate-800">Visualização de Atividade</CardTitle>
-          </CardHeader>
-          <CardContent className="p-8">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
-              </div>
-            ) : activityData ? (
-              <div className="space-y-8">
-                {/* Gráfico de Pizza */}
-                <div className="flex justify-center">
-                  <div className="relative">
-                    {/* Gráfico de pizza SVG */}
-                    <svg width="160" height="160" viewBox="0 0 160 160" className="transform -rotate-90">
-                      {/* Background circle */}
-                      <circle 
-                        cx="80" 
-                        cy="80" 
-                        r="70" 
-                        fill="#f1f5f9"
-                        stroke="#e2e8f0"
-                        strokeWidth="1"
-                      />
-                      
-                      {/* Active readers slice (verde) */}
-                      {pieData && (
+            <CardHeader className="p-6 pb-4">
+              <CardTitle className="text-lg font-black text-slate-800">Visualização de Atividade</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-0">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
+                </div>
+              ) : activityData ? (
+                <div className="space-y-4">
+                  {/* Gráfico de Pizza compacto */}
+                  <div className="flex justify-center">
+                    <div className="relative">
+                      <svg width="120" height="120" viewBox="0 0 120 120" className="transform -rotate-90">
                         <circle 
-                          cx="80" 
-                          cy="80" 
-                          r="70" 
-                          fill="transparent"
-                          stroke="#10b981"
-                          strokeWidth="12"
-                          strokeDasharray={`${pieData.active} ${360 - pieData.active}`}
-                          strokeLinecap="round"
+                          cx="60" 
+                          cy="60" 
+                          r="50" 
+                          fill="#f1f5f9"
+                          stroke="#e2e8f0"
+                          strokeWidth="1"
                         />
-                      )}
+                        
+                        {pieData && (
+                          <circle 
+                            cx="60" 
+                            cy="60" 
+                            r="50" 
+                            fill="transparent"
+                            stroke="#10b981"
+                            strokeWidth="10"
+                            strokeDasharray={`${pieData.active} ${360 - pieData.active}`}
+                            strokeLinecap="round"
+                          />
+                        )}
+                        
+                        {pieData && activityData.inactive > 0 && (
+                          <circle 
+                            cx="60" 
+                            cy="60" 
+                            r="50" 
+                            fill="transparent"
+                            stroke="#f59e0b"
+                            strokeWidth="10"
+                            strokeDasharray={`${pieData.inactive} ${360 - pieData.inactive}`}
+                            strokeDashoffset={`-${pieData.active}`}
+                            strokeLinecap="round"
+                          />
+                        )}
+                      </svg>
                       
-                      {/* Inactive readers slice (amarelo) - só aparece se houverem dados */}
-                      {pieData && activityData.inactive > 0 && (
-                        <circle 
-                          cx="80" 
-                          cy="80" 
-                          r="70" 
-                          fill="transparent"
-                          stroke="#f59e0b"
-                          strokeWidth="12"
-                          strokeDasharray={`${pieData.inactive} ${360 - pieData.inactive}`}
-                          strokeDashoffset={`-${pieData.active}`}
-                          strokeLinecap="round"
-                        />
-                      )}
-                    </svg>
-                    
-                    {/* Texto centralizado */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-slate-500">Total</div>
-                        <div className="text-2xl font-black text-slate-800">
-                          {activityData.total}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-xs font-bold text-slate-500">Total</div>
+                          <div className="text-xl font-black text-slate-800">
+                            {activityData.total}
+                          </div>
                         </div>
-                        <div className="text-xs text-slate-400">leitores</div>
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Legendas */}
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-emerald-500 rounded-full" />
-                      <span className="text-sm font-bold text-slate-600">Leitores Engajados</span>
+                  
+                  {/* Legendas compactas */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                        <span className="text-xs font-bold text-slate-600">Engajados</span>
+                      </div>
+                      <div className="text-sm font-bold text-slate-800">{activityData.active}</div>
                     </div>
-                    <div className="text-lg font-bold text-slate-800">{activityData.active}</div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-amber-500 rounded-full" />
-                      <span className="text-sm font-bold text-slate-600">Leitores em Pausa</span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-amber-500 rounded-full" />
+                        <span className="text-xs font-bold text-slate-600">Em Pausa</span>
+                      </div>
+                      <div className="text-sm font-bold text-slate-800">{activityData.inactive}</div>
                     </div>
-                    <div className="text-lg font-bold text-slate-800">{activityData.inactive}</div>
                   </div>
                 </div>
-                
-                <div className="pt-6 border-t border-slate-50 text-center">
-                  <p className="text-xs text-slate-400 font-medium">
-                    Dados atualizados automaticamente em tempo real
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12 text-slate-400">Nenhum dado encontrado.</div>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="text-center py-6 text-slate-400 text-sm">Nenhum dado encontrado.</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );
