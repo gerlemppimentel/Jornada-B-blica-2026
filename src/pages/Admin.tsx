@@ -22,33 +22,27 @@ const AdminDashboard = () => {
   const fetchActivityData = async () => {
     try {
       setLoading(true);
+      
+      // Buscar total de usuários
       const { count: totalUsers, error: countError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
       if (countError) throw countError;
 
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      // Usar a função RPC para contar usuários ativos dos últimos 7 dias
+      const { data: activeCount, error: rpcError } = await supabase
+        .rpc('count_active_users_last_7_days');
 
-      // CORREÇÃO: Buscar usuários únicos que tiveram atividade nos últimos 7 dias
-      const { data: activeUsers, error: activeError } = await supabase
-        .from('readings')
-        .select('user_id')
-        .ilike('book_name', 'Semana%')
-        .gte('completed_at', sevenDaysAgo.toISOString());
+      if (rpcError) throw rpcError;
 
-      if (activeError) throw activeError;
-
-      // CORREÇÃO: Contar usuários únicos (não registros)
-      const uniqueActiveUserIds = new Set(activeUsers?.map(u => u.user_id) || []);
-      const activeCount = uniqueActiveUserIds.size;
       const total = totalUsers || 0;
+      const active = activeCount || 0;
       
       setActivityData({
         total,
-        active: activeCount,
-        inactive: Math.max(0, total - activeCount)
+        active,
+        inactive: Math.max(0, total - active)
       });
     } catch (error: any) {
       console.error("Erro ao buscar dados:", error);
