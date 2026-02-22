@@ -58,6 +58,40 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchActivityData();
+
+    // Subscription para atualização em tempo real
+    const subscription = supabase
+      .channel('readings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'readings'
+        },
+        () => {
+          // Atualizar dados quando novo registro for inserido
+          fetchActivityData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE', 
+          schema: 'public',
+          table: 'readings'
+        },
+        () => {
+          // Atualizar dados quando registro for deletado
+          fetchActivityData();
+        }
+      )
+      .subscribe();
+
+    // Cleanup da subscription
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {
