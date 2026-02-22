@@ -6,9 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trophy, Medal, Crown, Users } from "lucide-react";
+import { Trophy, Medal, Crown, Users, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 interface CongregationRanking {
   congregation: string;
@@ -120,7 +121,18 @@ const CongregationRankingModal = ({
             </div>
           )}
           
-          <div className="pt-4 border-t border-slate-100 text-center">
+          <div className="pt-4 border-t border-slate-100">
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Button>
+          </div>
+          
+          <div className="text-center">
             <p className="text-xs text-slate-400 font-medium">
               Dados atualizados automaticamente dos últimos 7 dias
             </p>

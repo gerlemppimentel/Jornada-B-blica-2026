@@ -2,7 +2,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Info, Globe, ExternalLink, LayoutDashboard, Mail, Trophy } from "lucide-react";
+import { LogOut, BookOpen, Info, Globe, ExternalLink, LayoutDashboard, Mail, Trophy, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -115,6 +115,16 @@ const Navbar = () => {
                         </div>
                       </div>
                     </div>
+                    
+                    <div className="pt-4 border-t border-slate-100">
+                      <Button
+                        variant="ghost"
+                        className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Voltar
+                      </Button>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -147,6 +157,16 @@ const Navbar = () => {
                         <ExternalLink className="w-4 h-4 text-slate-400" />
                       </a>
                     ))}
+                  </div>
+                  
+                  <div className="pt-4 border-t border-slate-100 mt-4">
+                    <Button
+                      variant="ghost"
+                      className="w-full text-slate-500 hover:text-slate-700 flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Voltar
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
