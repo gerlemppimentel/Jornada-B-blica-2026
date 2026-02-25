@@ -104,7 +104,7 @@ const Navbar = () => {
                           >
                             <Mail className="w-3 h-3 text-slate-400 group-hover:text-slate-900" />
                             <span className="underline underline-offset-2 decoration-slate-200 group-hover:decoration-slate-900">
-                              gerlem.dev@outlook.com
+                              suporte@gerlem.dev.br
                             </span>
                           </a>
                         </div>
