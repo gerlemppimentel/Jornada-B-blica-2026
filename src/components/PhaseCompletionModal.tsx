@@ -35,7 +35,7 @@ const PhaseCompletionModal = ({ isOpen, onClose, phaseName, gemName, gemColor }:
         
         <div className="space-y-6">
           <p className="text-slate-600 font-medium">
-            Você concluiu a leitura do <span className="font-bold" style={{ color: gemColor }}>{phaseName}</span>, siga firme na Jornada!
+            Você concluiu a leitura de: <span className="font-bold" style={{ color: gemColor }}>{phaseName}</span>, siga firme na Jornada!
           </p>
           
           <div className="flex flex-col items-center gap-2">
