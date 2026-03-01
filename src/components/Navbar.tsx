@@ -78,6 +78,11 @@ const Navbar = () => {
                   </DialogHeader>
                   <div className="space-y-6">
                     <div className="text-center">
+                      <img 
+                        src="/logo-empresa.png" 
+                        alt="Logo Empresa" 
+                        className="max-h-24 w-auto object-contain mx-auto mb-4"
+                      />
                       <h3 className="font-bold text-lg text-slate-800">Jornada Bíblica - Versão 2026</h3>
                       <div className="mt-4 space-y-4 text-sm text-slate-600">
                         <div className="space-y-1">
