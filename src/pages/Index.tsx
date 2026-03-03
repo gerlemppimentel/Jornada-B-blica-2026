@@ -9,6 +9,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import WeeklyProgress from "@/components/WeeklyProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import BrevoWidget from "@/components/BrevoWidget";
 
 const Index = () => {
   const [completedCount, setCompletedCount] = useState(0);
@@ -93,6 +94,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
+      <BrevoWidget />
       <Navbar />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 space-y-8">
         <div className="space-y-2">
